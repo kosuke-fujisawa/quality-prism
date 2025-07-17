@@ -73,6 +73,7 @@ npm run dev
 - **Vitest**: 高速テストフレームワーク
 - **jsdom**: DOM環境シミュレーション
 - **fake-indexeddb**: IndexedBテスト環境
+- **Playwright**: E2Eテストフレームワーク
 - **ESLint**: コード品質チェック・自動修正
 - **Prettier**: コードフォーマット自動化
 - **textlint**: シナリオテキスト品質チェック
@@ -97,6 +98,21 @@ npm run test:ui
 
 # テスト実行 (CIモード)
 npm run test:run
+
+# E2Eテスト実行
+npm run test:e2e
+
+# E2Eテスト（ヘッドありモード）
+npm run test:e2e:headed
+
+# E2EテストUI表示
+npm run test:e2e:ui
+
+# E2Eテストデバッグモード
+npm run test:e2e:debug
+
+# E2Eテストレポート表示
+npm run test:e2e:report
 
 # コードlint実行
 npm run lint
@@ -156,11 +172,17 @@ npm run textlint:fix
 - `DexieGameProgressRepository.test.ts` (12 tests): ゲーム進行リポジトリ
 - `DexieGameSettingsRepository.test.ts` (14 tests): ゲーム設定リポジトリ
 
+#### E2Eテスト (Playwright)
+- **ユーザーシナリオ**: 実際のブラウザ環境でのゲーム動作検証
+- **統合テスト**: 全レイヤーの協調動作テスト
+- **UI操作テスト**: ゲームアプリケーションの実際の操作フロー
+
 #### テスト品質特徴
 - **TDD準拠**: t_wadaさんの推奨手法に基づく
 - **エッジケース網羅**: 境界値・特殊文字・エラー処理
 - **モック使用**: 依存関係の分離とテスト独立性
 - **データ整合性**: 永続化・復元・並行処理の検証
+- **E2E検証**: 実際のブラウザ環境でのユーザーシナリオテスト
 
 詳細な開発ガイドラインは [CLAUDE.md](CLAUDE.md) を参照してください。
 
@@ -202,10 +224,13 @@ quality-prism/
 │   │       └── SaveDataDB.ts    # Dexieデータベース
 │   └── storage/                 # 従来のストレージ
 │       └── SaveData.ts          # セーブデータ管理
+├── tests/                       # E2Eテストディレクトリ
+│   └── e2e/                     # E2Eテストファイル
 ├── public/
 │   └── scenarios/               # YAMLシナリオファイル
 │       ├── opening.yaml         # オープニング
 │       └── route1_1.yaml        # ルート1 シーン1
+├── playwright.config.ts         # Playwright設定
 ├── CLAUDE.md                    # TDD開発ガイドライン
 └── README.md                    # このファイル
 ```
@@ -297,6 +322,7 @@ texts:
 - [x] **TDD準拠開発プロセス**
 - [x] **エッジケース・エラーハンドリング**
 - [x] **データ永続化・復元システム**
+- [x] **E2Eテストフレームワーク（Playwright）**
 
 ### 今後の予定 🚀
 - [ ] テキスト送りシステム (クリック/ENTERキー)
