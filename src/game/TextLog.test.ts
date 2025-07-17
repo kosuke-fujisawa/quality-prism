@@ -6,8 +6,8 @@ import { SaveDataDB } from '../storage/SaveData';
 vi.mock('../storage/SaveData', () => ({
   SaveDataDB: vi.fn().mockImplementation(() => ({
     updateSaveData: vi.fn(),
-    getOrCreateSaveData: vi.fn()
-  }))
+    getOrCreateSaveData: vi.fn(),
+  })),
 }));
 
 describe('TextLog', () => {
@@ -17,9 +17,9 @@ describe('TextLog', () => {
   beforeEach(() => {
     mockDB = {
       updateSaveData: vi.fn(),
-      getOrCreateSaveData: vi.fn()
+      getOrCreateSaveData: vi.fn(),
     };
-    
+
     (SaveDataDB as any).mockImplementation(() => mockDB);
     textLog = new TextLog();
   });
@@ -27,21 +27,21 @@ describe('TextLog', () => {
   describe('テキストログの追加', () => {
     it('新しいテキストを追加できる', () => {
       textLog.addText('route1', 1, 'こんにちは');
-      
+
       const logs = textLog.getLogs();
       expect(logs).toHaveLength(1);
       expect(logs[0]).toEqual({
         route: 'route1',
         scene: 1,
         text: 'こんにちは',
-        timestamp: expect.any(Date)
+        timestamp: expect.any(Date),
       });
     });
 
     it('複数のテキストを順番に追加できる', () => {
       textLog.addText('route1', 1, 'こんにちは');
       textLog.addText('route1', 2, 'さようなら');
-      
+
       const logs = textLog.getLogs();
       expect(logs).toHaveLength(2);
       expect(logs[0].text).toBe('こんにちは');
@@ -51,7 +51,7 @@ describe('TextLog', () => {
     it('異なるルートのテキストを追加できる', () => {
       textLog.addText('route1', 1, 'ルート1のテキスト');
       textLog.addText('route2', 1, 'ルート2のテキスト');
-      
+
       const logs = textLog.getLogs();
       expect(logs).toHaveLength(2);
       expect(logs[0].route).toBe('route1');
@@ -69,7 +69,7 @@ describe('TextLog', () => {
       textLog.addText('route1', 1, 'ルート1のテキスト');
       textLog.addText('route2', 1, 'ルート2のテキスト');
       textLog.addText('route1', 2, 'ルート1のテキスト2');
-      
+
       const route1Logs = textLog.getLogsByRoute('route1');
       expect(route1Logs).toHaveLength(2);
       expect(route1Logs[0].text).toBe('ルート1のテキスト');
@@ -86,9 +86,9 @@ describe('TextLog', () => {
     it('すべてのログをクリアできる', () => {
       textLog.addText('route1', 1, 'テキスト1');
       textLog.addText('route2', 1, 'テキスト2');
-      
+
       textLog.clearLogs();
-      
+
       const logs = textLog.getLogs();
       expect(logs).toEqual([]);
     });
@@ -96,9 +96,9 @@ describe('TextLog', () => {
     it('特定のルートのログのみをクリアできる', () => {
       textLog.addText('route1', 1, 'ルート1のテキスト');
       textLog.addText('route2', 1, 'ルート2のテキスト');
-      
+
       textLog.clearLogsByRoute('route1');
-      
+
       const allLogs = textLog.getLogs();
       expect(allLogs).toHaveLength(1);
       expect(allLogs[0].route).toBe('route2');
@@ -110,7 +110,7 @@ describe('TextLog', () => {
       textLog.addText('route1', 1, 'こんにちは、世界！');
       textLog.addText('route1', 2, 'さようなら、世界！');
       textLog.addText('route2', 1, 'こんばんは');
-      
+
       const searchResults = textLog.searchLogs('世界');
       expect(searchResults).toHaveLength(2);
       expect(searchResults[0].text).toBe('こんにちは、世界！');
@@ -119,7 +119,7 @@ describe('TextLog', () => {
 
     it('検索結果が見つからない場合は空配列を返す', () => {
       textLog.addText('route1', 1, 'こんにちは');
-      
+
       const searchResults = textLog.searchLogs('存在しないテキスト');
       expect(searchResults).toEqual([]);
     });
@@ -128,11 +128,11 @@ describe('TextLog', () => {
   describe('テキストログの保存', () => {
     it('ログを保存できる', async () => {
       textLog.addText('route1', 1, 'テストテキスト');
-      
+
       await textLog.saveLogs();
-      
+
       expect(mockDB.updateSaveData).toHaveBeenCalledWith({
-        textLogs: expect.any(Array)
+        textLogs: expect.any(Array),
       });
     });
 
@@ -142,16 +142,16 @@ describe('TextLog', () => {
           route: 'route1',
           scene: 1,
           text: '保存されたテキスト',
-          timestamp: new Date('2023-01-01T00:00:00Z')
-        }
+          timestamp: new Date('2023-01-01T00:00:00Z'),
+        },
       ];
-      
+
       mockDB.getOrCreateSaveData.mockResolvedValue({
-        textLogs: mockLogs
+        textLogs: mockLogs,
       });
-      
+
       await textLog.loadLogs();
-      
+
       const logs = textLog.getLogs();
       expect(logs).toHaveLength(1);
       expect(logs[0].text).toBe('保存されたテキスト');
@@ -162,11 +162,11 @@ describe('TextLog', () => {
     it('最大ログ数を超えた場合、古いログが削除される', () => {
       // 最大ログ数を5に設定した場合のテスト
       textLog.setMaxLogs(5);
-      
+
       for (let i = 1; i <= 7; i++) {
         textLog.addText('route1', i, `テキスト${i}`);
       }
-      
+
       const logs = textLog.getLogs();
       expect(logs).toHaveLength(5);
       expect(logs[0].text).toBe('テキスト3'); // 最初の2つが削除される

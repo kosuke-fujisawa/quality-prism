@@ -5,19 +5,20 @@ export class NovelGameApp {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private currentOptions: string[] = [];
-  private gameState: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' = 'menu';
+  private gameState: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' =
+    'menu';
   private gameLogic: GameLogic;
   private textLog: TextLog;
 
   constructor() {
     this.gameLogic = new GameLogic();
     this.textLog = new TextLog();
-    
+
     this.canvas = document.querySelector<HTMLCanvasElement>('#gameCanvas')!;
     if (!this.canvas) {
       throw new Error('Canvas element not found');
     }
-    
+
     this.ctx = this.canvas.getContext('2d')!;
     this.setupCanvas();
     this.setupEventListeners();
@@ -44,7 +45,7 @@ export class NovelGameApp {
 
   private setupEventListeners(): void {
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.gameState !== 'menu') {
@@ -62,16 +63,16 @@ export class NovelGameApp {
   private handleClick(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    
+
     if (this.gameState === 'menu' && this.currentOptions.length > 0) {
       // テキストのベースライン基準で描画されているため、クリック範囲を調整
       // 各メニュー項目のY座標: 250, 300, 350, 400, 450
       // クリック可能範囲: 各項目の上下25pxずつ（テキスト高さを考慮）
       for (let i = 0; i < this.currentOptions.length; i++) {
-        const itemY = 250 + (i * 50);
-        const itemTop = itemY - 25;  // テキストより上25px
-        const itemBottom = itemY + 25;  // テキストより下25px
-        
+        const itemY = 250 + i * 50;
+        const itemTop = itemY - 25; // テキストより上25px
+        const itemBottom = itemY + 25; // テキストより下25px
+
         if (y >= itemTop && y <= itemBottom) {
           this.selectMenuOption(this.currentOptions[i]);
           break;
@@ -86,14 +87,18 @@ export class NovelGameApp {
         case 'start':
           await this.gameLogic.selectRoute('opening');
           this.gameState = 'game';
-          this.showMessage(`ゲーム開始！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`);
+          this.showMessage(
+            `ゲーム開始！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`
+          );
           break;
         case 'load':
           this.gameState = 'game';
           if (this.gameLogic.currentRoute === '') {
             this.showMessage('セーブデータがありません');
           } else {
-            this.showMessage(`ロード完了！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`);
+            this.showMessage(
+              `ロード完了！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`
+            );
           }
           break;
         case 'gallery':
@@ -117,18 +122,18 @@ export class NovelGameApp {
   private showMainMenu(): void {
     this.gameState = 'menu';
     this.clearCanvas();
-    
+
     this.ctx.font = '36px Arial';
     this.ctx.fillText('品質のプリズム', 250, 150);
-    
+
     this.ctx.font = '24px Arial';
     this.currentOptions = ['start', 'load', 'gallery', 'mini game', 'credit'];
-    
+
     this.currentOptions.forEach((option, index) => {
-      const y = 250 + (index * 50);
+      const y = 250 + index * 50;
       this.ctx.fillText(`${index + 1}. ${option.toUpperCase()}`, 300, y);
     });
-    
+
     this.ctx.font = '16px Arial';
     this.ctx.fillText('数字キーまたはクリックで選択', 300, 550);
   }
@@ -184,7 +189,9 @@ export class NovelGameApp {
     return this.gameState;
   }
 
-  public setGameState(state: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame'): void {
+  public setGameState(
+    state: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame'
+  ): void {
     this.gameState = state;
   }
 }

@@ -13,13 +13,13 @@ export class GameLogic {
 
   async selectRoute(routeName: string): Promise<boolean> {
     const saveData = await this.db.getOrCreateSaveData();
-    
+
     // トゥルールートの判定
     if (routeName === 'trueRoute') {
-      const allRoutesCleared = this.availableRoutes.every(route => 
+      const allRoutesCleared = this.availableRoutes.every((route) =>
         saveData.clearedRoutes.includes(route)
       );
-      
+
       if (!allRoutesCleared) {
         return false;
       }
@@ -32,7 +32,7 @@ export class GameLogic {
 
     await this.db.updateSaveData({
       currentRoute: routeName,
-      currentScene: 0
+      currentScene: 0,
     });
 
     return true;
@@ -45,13 +45,13 @@ export class GameLogic {
     if (this.currentScene >= this.SCENES_PER_ROUTE) {
       const saveData = await this.db.getOrCreateSaveData();
       const clearedRoutes = [...saveData.clearedRoutes];
-      
+
       if (!clearedRoutes.includes(this.currentRoute)) {
         clearedRoutes.push(this.currentRoute);
       }
 
       await this.db.updateSaveData({
-        clearedRoutes
+        clearedRoutes,
       });
 
       return true; // ルートクリア
@@ -59,7 +59,7 @@ export class GameLogic {
 
     await this.db.updateSaveData({
       currentRoute: this.currentRoute,
-      currentScene: this.currentScene
+      currentScene: this.currentScene,
     });
 
     return false; // 続行
@@ -67,18 +67,18 @@ export class GameLogic {
 
   async autoSave(): Promise<void> {
     const settings = await this.db.getSettings();
-    
+
     if (settings.autoSave) {
       await this.db.updateSaveData({
         currentRoute: this.currentRoute,
-        currentScene: this.currentScene
+        currentScene: this.currentScene,
       });
     }
   }
 
   async loadGameState(): Promise<void> {
     const saveData = await this.db.getOrCreateSaveData();
-    
+
     this.currentRoute = saveData.currentRoute;
     this.currentScene = saveData.currentScene;
   }

@@ -12,7 +12,7 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
         font: '',
         fillText: vi.fn(),
         fillRect: vi.fn(),
-        measureText: vi.fn(() => ({ width: 100 }))
+        measureText: vi.fn(() => ({ width: 100 })),
       };
     }
     addEventListener = vi.fn();
@@ -20,7 +20,7 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
     getBoundingClientRect() {
       return { top: 0, left: 0, width: 800, height: 600 };
     }
-  }
+  },
 });
 
 // DocumentのモックでHTMLCanvasElementを返す
@@ -30,7 +30,7 @@ const mockCanvas = new (window as any).HTMLCanvasElement();
   querySelector: vi.fn(() => mockCanvas),
   addEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
-  readyState: 'complete'
+  readyState: 'complete',
 } as any;
 
 // globalに公開
@@ -59,8 +59,14 @@ describe('NovelGameApp', () => {
 
     it('イベントリスナーを設定する', () => {
       app = new NovelGameApp();
-      expect(mockCanvas.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
-      expect(document.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+      expect(mockCanvas.addEventListener).toHaveBeenCalledWith(
+        'click',
+        expect.any(Function)
+      );
+      expect(document.addEventListener).toHaveBeenCalledWith(
+        'keydown',
+        expect.any(Function)
+      );
     });
   });
 
@@ -68,57 +74,75 @@ describe('NovelGameApp', () => {
     beforeEach(async () => {
       app = new NovelGameApp();
       // 初期化を待つ
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
     it('メニュー状態で数字キー1-5に反応する', () => {
       const selectMenuSpy = vi.spyOn(app as any, 'selectMenuOption');
-      
+
       // ゲーム状態がmenuであることを確認
       expect((app as any).gameState).toBe('menu');
-      
+
       // currentOptionsが空の場合は手動で設定してテスト続行
       if ((app as any).currentOptions.length === 0) {
-        (app as any).currentOptions = ['start', 'load', 'gallery', 'mini game', 'credit'];
+        (app as any).currentOptions = [
+          'start',
+          'load',
+          'gallery',
+          'mini game',
+          'credit',
+        ];
       }
-      
+
       // イベントリスナーを直接呼び出し
       const keyEvent = new KeyboardEvent('keydown', { key: '1' });
-      const addEventListenerCalls = (document.addEventListener as any).mock.calls;
-      const keyHandler = addEventListenerCalls.find((call: any[]) => call[0] === 'keydown')?.[1];
+      const addEventListenerCalls = (document.addEventListener as any).mock
+        .calls;
+      const keyHandler = addEventListenerCalls.find(
+        (call: any[]) => call[0] === 'keydown'
+      )?.[1];
       if (keyHandler) keyHandler(keyEvent);
-      
+
       expect(selectMenuSpy).toHaveBeenCalledWith('start');
     });
 
     it('メニュー状態でEscキーは無反応', () => {
       const showMenuSpy = vi.spyOn(app as any, 'showMainMenu');
       const initialCallCount = showMenuSpy.mock.calls.length;
-      
+
       const keyEvent = new KeyboardEvent('keydown', { key: 'Escape' });
       document.dispatchEvent(keyEvent);
-      
+
       // 初期化時の呼び出し以外は増えない
       expect(showMenuSpy).toHaveBeenCalledTimes(initialCallCount);
     });
 
     it('クリック位置からメニュー項目を正しく計算する', () => {
       const selectMenuSpy = vi.spyOn(app as any, 'selectMenuOption');
-      
+
       // currentOptionsが空の場合は手動で設定してテスト続行
       if ((app as any).currentOptions.length === 0) {
-        (app as any).currentOptions = ['start', 'load', 'gallery', 'mini game', 'credit'];
+        (app as any).currentOptions = [
+          'start',
+          'load',
+          'gallery',
+          'mini game',
+          'credit',
+        ];
       }
-      
+
       // STARTの位置（y=250-299）をクリック
       const clickEvent = {
         clientY: 275,
-        target: mockCanvas
+        target: mockCanvas,
       };
-      const addEventListenerCalls = (mockCanvas.addEventListener as any).mock.calls;
-      const clickHandler = addEventListenerCalls.find((call: any[]) => call[0] === 'click')?.[1];
+      const addEventListenerCalls = (mockCanvas.addEventListener as any).mock
+        .calls;
+      const clickHandler = addEventListenerCalls.find(
+        (call: any[]) => call[0] === 'click'
+      )?.[1];
       if (clickHandler) clickHandler(clickEvent);
-      
+
       expect(selectMenuSpy).toHaveBeenCalledWith('start');
     });
   });
@@ -139,12 +163,15 @@ describe('NovelGameApp', () => {
 
     it('ゲーム状態でEscキーを押すとメニューに戻る', () => {
       app.setGameState('game');
-      
+
       const keyEvent = new KeyboardEvent('keydown', { key: 'Escape' });
-      const addEventListenerCalls = (document.addEventListener as any).mock.calls;
-      const keyHandler = addEventListenerCalls.find((call: any[]) => call[0] === 'keydown')?.[1];
+      const addEventListenerCalls = (document.addEventListener as any).mock
+        .calls;
+      const keyHandler = addEventListenerCalls.find(
+        (call: any[]) => call[0] === 'keydown'
+      )?.[1];
       if (keyHandler) keyHandler(keyEvent);
-      
+
       expect(app.getGameState()).toBe('menu');
     });
   });
@@ -152,7 +179,7 @@ describe('NovelGameApp', () => {
   describe('エラーハンドリング', () => {
     it('キャンバス要素が見つからない場合の処理', () => {
       (document.querySelector as any).mockReturnValueOnce(null);
-      
+
       expect(() => {
         new NovelGameApp();
       }).toThrow('Canvas element not found');
@@ -160,7 +187,7 @@ describe('NovelGameApp', () => {
 
     it('無効なメニューオプションの処理', () => {
       app = new NovelGameApp();
-      
+
       expect(() => {
         (app as any).selectMenuOption('invalid');
       }).not.toThrow();

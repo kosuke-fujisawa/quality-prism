@@ -21,7 +21,7 @@ export class TextLog {
       route,
       scene,
       text,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.logs.push(entry);
@@ -37,7 +37,7 @@ export class TextLog {
   }
 
   getLogsByRoute(route: string): TextLogEntry[] {
-    return this.logs.filter(log => log.route === route);
+    return this.logs.filter((log) => log.route === route);
   }
 
   clearLogs(): void {
@@ -45,18 +45,16 @@ export class TextLog {
   }
 
   clearLogsByRoute(route: string): void {
-    this.logs = this.logs.filter(log => log.route !== route);
+    this.logs = this.logs.filter((log) => log.route !== route);
   }
 
   searchLogs(searchText: string): TextLogEntry[] {
-    return this.logs.filter(log => 
-      log.text.includes(searchText)
-    );
+    return this.logs.filter((log) => log.text.includes(searchText));
   }
 
   setMaxLogs(maxLogs: number): void {
     this.maxLogs = maxLogs;
-    
+
     // 現在のログ数が上限を超えている場合、古いログを削除
     if (this.logs.length > maxLogs) {
       this.logs = this.logs.slice(-maxLogs);
@@ -65,16 +63,16 @@ export class TextLog {
 
   async saveLogs(): Promise<void> {
     await this.db.updateSaveData({
-      textLogs: this.logs
+      textLogs: this.logs,
     });
   }
 
   async loadLogs(): Promise<void> {
     const saveData = await this.db.getOrCreateSaveData();
     if (saveData.textLogs && Array.isArray(saveData.textLogs)) {
-      this.logs = saveData.textLogs.map(log => ({
+      this.logs = saveData.textLogs.map((log) => ({
         ...log,
-        timestamp: new Date(log.timestamp)
+        timestamp: new Date(log.timestamp),
       }));
     }
   }

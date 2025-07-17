@@ -4,24 +4,24 @@ background: dev_office.jpg
 bgm: thinking_theme.mp3
 characters:
   - id: mentor
-    name: "開発メンター"
+    name: '開発メンター'
     position: left
     sprite: mentor_normal.png
   - id: junior
-    name: "新人開発者"
+    name: '新人開発者'
     position: right
     sprite: junior_normal.png
 default_speaker: mentor
 texts:
   - speaker: mentor
     content:
-      - "ルート1：テスト駆動開発の道"
-      - "テストから始まる開発手法について学ぼう。"
+      - 'ルート1：テスト駆動開発の道'
+      - 'テストから始まる開発手法について学ぼう。'
   - speaker: junior
-    content: "テストから書くんですか？"
+    content: 'テストから書くんですか？'
     sprite: junior_surprised.png
   - speaker: mentor
     content:
-      - "そうだ。まずは失敗するテストを書き、"
-      - "そのテストを通すコードを実装するんだ。"
+      - 'そうだ。まずは失敗するテストを書き、'
+      - 'そのテストを通すコードを実装するんだ。'
     sprite: mentor_explaining.png

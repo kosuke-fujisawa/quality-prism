@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <h1>Basic Test</h1>
+    <button id="testBtn">Click Me</button>
+    <canvas
+      id="testCanvas"
+      width="200"
+      height="200"
+      style="border: 1px solid black"
+    ></canvas>
+
+    <script>
+      console.log('Test script loaded');
+
+      document.addEventListener('click', function (e) {
+        console.log('Document click:', e.target.tagName);
+        alert('Click detected on: ' + e.target.tagName);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        console.log('Key pressed:', e.key);
+        alert('Key pressed: ' + e.key);
+      });
+
+      const btn = document.getElementById('testBtn');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          console.log('Button clicked');
+          alert('Button clicked!');
+        });
+      }
+
+      const canvas = document.getElementById('testCanvas');
+      if (canvas) {
+        canvas.addEventListener('click', function () {
+          console.log('Canvas clicked');
+          alert('Canvas clicked!');
+        });
+      }
+    </script>
+  </body>
+</html>
