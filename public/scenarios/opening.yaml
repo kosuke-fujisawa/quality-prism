@@ -1,0 +1,30 @@
+route: opening
+scene: 1
+background: title_bg.jpg
+bgm: opening_theme.mp3
+characters:
+  - id: narrator
+    name: "ナレーター"
+    position: center
+    sprite: null
+  - id: mentor
+    name: "開発メンター"
+    position: left
+    sprite: mentor_normal.png
+  - id: junior
+    name: "新人開発者"
+    position: right
+    sprite: junior_normal.png
+default_speaker: narrator
+texts:
+  - speaker: narrator
+    content:
+      - "品質のプリズム"
+      - ""
+      - "それぞれが異なる視点から、品質の本質を探求していく。"
+  - speaker: mentor
+    content: "ソフトウェア開発の世界で、品質とは何かを問いかける物語。"
+    sprite: mentor_thinking.png
+  - speaker: junior
+    content: "三つのルートがあるんですね！"
+    sprite: junior_excited.png
