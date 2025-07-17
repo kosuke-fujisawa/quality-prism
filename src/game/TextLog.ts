@@ -9,7 +9,7 @@ export interface TextLogEntry {
 
 export class TextLog {
   private logs: TextLogEntry[] = [];
-  private maxLogs: number = 1000;
+  private maxLogs = 1000;
   private db: SaveDataDB;
 
   constructor() {
