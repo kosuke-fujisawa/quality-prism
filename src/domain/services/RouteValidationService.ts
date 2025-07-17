@@ -28,7 +28,7 @@ export class RouteValidationService {
     }
 
     // トゥルールートの場合
-    if (RouteConfiguration.isTrueRoute(routeValue)) {
+    if (routeValue === 'trueRoute') {
       return this.validateTrueRoute(progress);
     }
 

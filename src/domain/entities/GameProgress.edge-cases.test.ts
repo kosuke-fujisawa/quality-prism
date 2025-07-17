@@ -29,7 +29,7 @@ describe('GameProgress エッジケース', () => {
       const completed = progress.advanceToNextScene();
       expect(completed).toBe(true);
       expect(progress.getCurrentScene().getValue()).toBe(100);
-      expect(progress.getClearedRoutes().has(RouteId.from('route1'))).toBe(true);
+      expect(progress.isRouteNameCleared('route1')).toBe(true);
     });
 
     it('シーン100（最終シーン）で次に進んでも状態が変わらない', () => {
@@ -152,8 +152,8 @@ describe('GameProgress エッジケース', () => {
       );
       
       expect(progress.getClearedRoutes().size).toBe(2);
-      expect(progress.getClearedRoutes().has(RouteId.from('route1'))).toBe(true);
-      expect(progress.getClearedRoutes().has(RouteId.from('route2'))).toBe(true);
+      expect(progress.isRouteNameCleared('route1')).toBe(true);
+      expect(progress.isRouteNameCleared('route2')).toBe(true);
     });
   });
 

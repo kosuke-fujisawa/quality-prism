@@ -24,7 +24,7 @@ export class SceneNumber {
   }
 
   isLastScene(maxScenes: number): boolean {
-    return this.value >= maxScenes - 1;
+    return this.value === maxScenes - 1;
   }
 
   toString(): string {

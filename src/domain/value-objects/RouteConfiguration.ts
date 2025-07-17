@@ -101,8 +101,8 @@ export class RouteConfiguration {
    * （全ベースルートがクリアされている）
    */
   static isTrueRouteUnlockCondition(clearedRoutes: string[]): boolean {
-    return this.config.baseRoutes.every(route => 
-      clearedRoutes.includes(route)
+    return this.config.baseRoutes.every(baseRoute => 
+      clearedRoutes.includes(baseRoute)
     );
   }
 

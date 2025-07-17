@@ -64,7 +64,7 @@ describe('GameService', () => {
       const result = await gameService.selectRoute('trueRoute');
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('全てのルートをクリアしてください');
+      expect(result.message).toBe('トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください');
       expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
     });
 

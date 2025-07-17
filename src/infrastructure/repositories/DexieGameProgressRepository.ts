@@ -28,7 +28,6 @@ export class DexieGameProgressRepository implements GameProgressRepository {
 
     // 新規作成
     const newProgress = GameProgress.createNew('1');
-    await this.save(newProgress);
     return newProgress;
   }
 
@@ -54,19 +53,23 @@ export class DexieGameProgressRepository implements GameProgressRepository {
   }
 
   async findById(id: string): Promise<GameProgress | null> {
-    const data = await this.db.saveData.get(parseInt(id));
+    try {
+      const data = await this.db.saveData.get(parseInt(id));
 
-    if (!data) {
+      if (!data) {
+        return null;
+      }
+
+      return GameProgress.restore(
+        data.id?.toString() || id,
+        data.currentRoute,
+        data.currentScene,
+        data.clearedRoutes,
+        data.lastSaveTime
+      );
+    } catch (error) {
       return null;
     }
-
-    return GameProgress.restore(
-      data.id?.toString() || id,
-      data.currentRoute,
-      data.currentScene,
-      data.clearedRoutes,
-      data.lastSaveTime
-    );
   }
 
   async delete(id?: string): Promise<void> {

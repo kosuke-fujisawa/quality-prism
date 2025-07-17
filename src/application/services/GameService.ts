@@ -30,17 +30,17 @@ export class GameService {
       const routeId = RouteId.from(routeName);
 
       // トゥルールートの場合、解放条件をチェック
-      if (RouteConfiguration.isTrueRoute(routeName)) {
+      if (routeName === 'trueRoute') {
         if (!progress.isTrueRouteUnlocked()) {
           return {
             success: false,
-            message: '全てのルートをクリアしてください',
+            message: 'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください',
           };
         }
       }
 
       // 通常ルートの場合、利用可能かチェック
-      if (!RouteConfiguration.isTrueRoute(routeName) && !RouteConfiguration.isValidRoute(routeName)) {
+      if (routeName !== 'trueRoute' && !RouteConfiguration.isValidRoute(routeName)) {
         return {
           success: false,
           message: '無効なルートです',

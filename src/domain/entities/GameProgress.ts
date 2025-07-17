@@ -65,10 +65,15 @@ export class GameProgress {
    * @returns ルートがクリアされた場合はtrue
    */
   advanceToNextScene(): boolean {
+    // 最後のシーンを超えている場合は何もしない
+    if (this.currentScene.getValue() >= this.SCENES_PER_ROUTE) {
+      return false;
+    }
+
     this.currentScene = this.currentScene.next();
     this.updateSaveTime();
 
-    if (this.currentScene.isLastScene(this.SCENES_PER_ROUTE)) {
+    if (this.currentScene.getValue() === this.SCENES_PER_ROUTE) {
       this.markRouteAsCleared(this.currentRoute);
       return true;
     }
@@ -78,10 +83,11 @@ export class GameProgress {
 
   /**
    * トゥルールートが解放されているかチェック
+   * 全ベースルート（route1, route2, route3）がクリアされている必要がある
    */
   isTrueRouteUnlocked(): boolean {
     const clearedRouteNames = Array.from(this.clearedRoutes).map((route) => route.getValue());
-    return RouteConfiguration.isTrueRouteUnlockCondition(clearedRouteNames);
+    return ['route1', 'route2', 'route3'].every(route => clearedRouteNames.includes(route));
   }
 
   /**
@@ -93,8 +99,22 @@ export class GameProgress {
     );
   }
 
+  /**
+   * 指定したルート名がクリア済みかチェック
+   */
+  isRouteNameCleared(routeName: string): boolean {
+    return Array.from(this.clearedRoutes).some((cleared) =>
+      cleared.getValue() === routeName
+    );
+  }
+
   private markRouteAsCleared(routeId: RouteId): void {
-    this.clearedRoutes.add(routeId);
+    // 同じ値のRouteIdがすでにSetに存在しても、新しいインスタンスを追加
+    // Setは参照ベースなので、新しいインスタンスは追加される
+    const existingRoute = Array.from(this.clearedRoutes).find(route => route.equals(routeId));
+    if (!existingRoute) {
+      this.clearedRoutes.add(routeId);
+    }
   }
 
   private updateSaveTime(): void {
@@ -124,14 +144,19 @@ export class GameProgress {
     clearedRoutes: string[],
     lastSaveTime: Date
   ): GameProgress {
+    // 無効なシーン番号は0に正規化
+    const normalizedScene = Math.max(0, Math.min(currentScene, 100));
+    
+    // 重複除去のため、一度文字列のSetにしてからRouteIdのSetに変換
+    const uniqueRouteNames = Array.from(new Set(clearedRoutes));
     const clearedRouteSet = new Set(
-      clearedRoutes.map((route) => RouteId.from(route))
+      uniqueRouteNames.map((route) => RouteId.from(route))
     );
 
     return new GameProgress(
       id,
       RouteId.from(currentRoute),
-      SceneNumber.from(currentScene),
+      SceneNumber.from(normalizedScene),
       clearedRouteSet,
       lastSaveTime
     );
