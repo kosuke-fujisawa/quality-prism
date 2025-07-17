@@ -60,6 +60,11 @@ npm run dev
 - **TypeScript**: 型安全な開発言語
 - **Canvas API**: ゲーム描画エンジン
 
+### アーキテクチャ
+- **DDD**: Domain-Driven Design パターン
+- **Repository Pattern**: データアクセスの抽象化
+- **Dependency Injection**: 依存性注入による疎結合
+
 ### データ管理
 - **Dexie**: IndexedDB wrapper (セーブデータ・設定)
 - **js-yaml**: YAMLファイル読み込み
@@ -120,17 +125,23 @@ npm run textlint:fix
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 66
-- **成功率**: 100% (66/66)
-- **カバレッジ**: 全主要コンポーネント
+- **総テスト数**: 93
+- **成功率**: 100% (93/93)
+- **カバレッジ**: 全主要コンポーネント + DDDレイヤー
 
 ### テストスイート
+#### 既存アーキテクチャ
 - `NovelGameApp.test.ts` (11 tests): UI・イベント処理
 - `ChoiceSystem.test.ts` (16 tests): 選択肢・ルート分岐
 - `ScenarioLoader.test.ts` (8 tests): YAMLファイル読み込み
 - `GameLogic.test.ts` (10 tests): ゲーム状態管理
 - `TextLog.test.ts` (13 tests): テキストログ
 - `SaveData.test.ts` (8 tests): データ永続化
+
+#### DDDアーキテクチャ
+- `GameProgress.test.ts` (7 tests): ゲーム進行エンティティ
+- `RouteId.test.ts` (10 tests): ルートID値オブジェクト
+- `SceneNumber.test.ts` (10 tests): シーン番号値オブジェクト
 
 詳細な開発ガイドラインは [CLAUDE.md](CLAUDE.md) を参照してください。
 
@@ -141,12 +152,36 @@ quality-prism/
 ├── src/
 │   ├── NovelGameApp.ts          # メインアプリケーション
 │   ├── main.ts                  # エントリーポイント
-│   ├── game/                    # ゲームロジック
+│   ├── game/                    # 従来のゲームロジック
 │   │   ├── GameLogic.ts         # ゲーム状態管理
+│   │   ├── GameLogicDDD.ts      # DDD版ゲームロジック
 │   │   ├── ChoiceSystem.ts      # 選択肢・ルート分岐
 │   │   ├── ScenarioLoader.ts    # YAMLシナリオ読み込み
 │   │   └── TextLog.ts           # テキストログ
-│   └── storage/
+│   ├── domain/                  # DDDドメイン層
+│   │   ├── entities/            # エンティティ
+│   │   │   ├── GameProgress.ts  # ゲーム進行エンティティ
+│   │   │   └── TextLogEntry.ts  # テキストログエンティティ
+│   │   ├── value-objects/       # 値オブジェクト
+│   │   │   ├── RouteId.ts       # ルートID
+│   │   │   ├── SceneNumber.ts   # シーン番号
+│   │   │   └── GameSettings.ts  # ゲーム設定
+│   │   ├── repositories/        # リポジトリインターフェース
+│   │   │   ├── GameProgressRepository.ts
+│   │   │   ├── GameSettingsRepository.ts
+│   │   │   └── TextLogRepository.ts
+│   │   └── services/            # ドメインサービス
+│   │       └── RouteValidationService.ts
+│   ├── application/             # アプリケーション層
+│   │   └── services/
+│   │       └── GameService.ts   # ゲームサービス
+│   ├── infrastructure/          # インフラストラクチャ層
+│   │   ├── repositories/        # リポジトリ実装
+│   │   │   ├── DexieGameProgressRepository.ts
+│   │   │   └── DexieGameSettingsRepository.ts
+│   │   └── persistence/         # 永続化
+│   │       └── SaveDataDB.ts    # Dexieデータベース
+│   └── storage/                 # 従来のストレージ
 │       └── SaveData.ts          # セーブデータ管理
 ├── public/
 │   └── scenarios/               # YAMLシナリオファイル
@@ -155,6 +190,31 @@ quality-prism/
 ├── CLAUDE.md                    # TDD開発ガイドライン
 └── README.md                    # このファイル
 ```
+
+## 🏗️ アーキテクチャ
+
+### DDD (Domain-Driven Design)
+このプロジェクトは **DDD (Domain-Driven Design)** アーキテクチャを採用しています。
+
+#### レイヤー構成
+- **Domain Layer** (`src/domain/`): ビジネスロジックの核心
+  - **Entities**: ゲーム進行状況、テキストログエントリ
+  - **Value Objects**: ルートID、シーン番号、ゲーム設定
+  - **Repositories**: データ永続化の抽象化
+  - **Services**: ドメインサービス（ルート検証など）
+
+- **Application Layer** (`src/application/`): ユースケースの実装
+  - **Services**: ゲームサービス（ルート選択、進行管理など）
+
+- **Infrastructure Layer** (`src/infrastructure/`): 技術的実装
+  - **Repositories**: Dexie（IndexedDB）リポジトリ実装
+  - **Persistence**: データベース定義
+
+#### DDD設計の利点
+- **関心の分離**: ビジネスロジックと技術的実装の分離
+- **テスタビリティ**: 各レイヤーの独立したテスト
+- **保守性**: 明確な責任範囲による変更容易性
+- **拡張性**: 新機能追加時のクリーンなアーキテクチャ
 
 ## 🎯 ゲームシステム
 
