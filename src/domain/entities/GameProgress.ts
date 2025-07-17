@@ -1,6 +1,5 @@
 import { RouteId } from '../value-objects/RouteId';
 import { SceneNumber } from '../value-objects/SceneNumber';
-import { RouteConfiguration } from '../value-objects/RouteConfiguration';
 
 /**
  * ゲームの進行状況を表すエンティティ

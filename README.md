@@ -1,6 +1,6 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-212%20total%20|%20197%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-328%20total%20|%20328%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
 
@@ -141,8 +141,8 @@ npm run textlint:fix
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 212
-- **成功率**: 93% (197/212)
+- **総テスト数**: 328
+- **成功率**: 100% (328/328)
 - **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
 ### テストスイート
@@ -155,22 +155,28 @@ npm run textlint:fix
 - `TextLog.test.ts` (13 tests): テキストログ
 - `SaveData.test.ts` (8 tests): データ永続化
 
-#### DDDアーキテクチャ - ドメイン層 (76 tests)
+#### DDDアーキテクチャ - ドメイン層 (139 tests)
 - `GameProgress.test.ts` (7 tests): ゲーム進行エンティティ
 - `GameProgress.edge-cases.test.ts` (16 tests): エッジケース・境界値
 - `TextLogEntry.test.ts` (13 tests): テキストログエンティティ
 - `RouteId.test.ts` (10 tests): ルートID値オブジェクト
-- `RouteId.edge-cases.test.ts` (21 tests): エッジケース・特殊文字
+- `RouteId.edge-cases.test.ts` (22 tests): エッジケース・特殊文字・Unicode
 - `SceneNumber.test.ts` (10 tests): シーン番号値オブジェクト
+- `SceneNumber.edge-cases.test.ts` (22 tests): 境界値・型安全性・パフォーマンス
 - `GameSettings.test.ts` (18 tests): ゲーム設定値オブジェクト
+- `GameSettings.edge-cases.test.ts` (23 tests): 浮動小数点精度・不変性・NaN/Infinity処理
+- `RouteConfiguration.test.ts` (26 tests): ルート設定管理
+- `RouteConfiguration.extensibility.test.ts` (14 tests): 拡張性・柔軟性テスト
 - `RouteValidationService.test.ts` (9 tests): ルート検証ドメインサービス
 
-#### DDDアーキテクチャ - アプリケーション層 (16 tests)
+#### DDDアーキテクチャ - アプリケーション層 (31 tests)
 - `GameService.test.ts` (16 tests): ゲームアプリケーションサービス
+- `GameService.edge-cases.test.ts` (15 tests): 非同期エラー・競合状態・タイムアウト
 
-#### DDDアーキテクチャ - インフラストラクチャ層 (26 tests)
+#### DDDアーキテクチャ - インフラストラクチャ層 (41 tests)
 - `DexieGameProgressRepository.test.ts` (12 tests): ゲーム進行リポジトリ
 - `DexieGameSettingsRepository.test.ts` (14 tests): ゲーム設定リポジトリ
+- `DexieTextLogRepository.test.ts` (15 tests): テキストログリポジトリ
 
 #### E2Eテスト (Playwright)
 - **ユーザーシナリオ**: 実際のブラウザ環境でのゲーム動作検証
@@ -179,7 +185,9 @@ npm run textlint:fix
 
 #### テスト品質特徴
 - **TDD準拠**: t_wadaさんの推奨手法に基づく
-- **エッジケース網羅**: 境界値・特殊文字・エラー処理
+- **エッジケース網羅**: 境界値・特殊文字・Unicode・NaN/Infinity処理
+- **型安全性**: TypeScript型システムの完全活用
+- **パフォーマンステスト**: 大量データ・同時実行・タイムアウト処理
 - **モック使用**: 依存関係の分離とテスト独立性
 - **データ整合性**: 永続化・復元・並行処理の検証
 - **E2E検証**: 実際のブラウザ環境でのユーザーシナリオテスト
@@ -206,7 +214,8 @@ quality-prism/
 │   │   ├── value-objects/       # 値オブジェクト
 │   │   │   ├── RouteId.ts       # ルートID
 │   │   │   ├── SceneNumber.ts   # シーン番号
-│   │   │   └── GameSettings.ts  # ゲーム設定
+│   │   │   ├── GameSettings.ts  # ゲーム設定
+│   │   │   └── RouteConfiguration.ts # ルート設定管理
 │   │   ├── repositories/        # リポジトリインターフェース
 │   │   │   ├── GameProgressRepository.ts
 │   │   │   ├── GameSettingsRepository.ts
@@ -219,11 +228,15 @@ quality-prism/
 │   ├── infrastructure/          # インフラストラクチャ層
 │   │   ├── repositories/        # リポジトリ実装
 │   │   │   ├── DexieGameProgressRepository.ts
-│   │   │   └── DexieGameSettingsRepository.ts
+│   │   │   ├── DexieGameSettingsRepository.ts
+│   │   │   └── DexieTextLogRepository.ts
 │   │   └── persistence/         # 永続化
 │   │       └── SaveDataDB.ts    # Dexieデータベース
-│   └── storage/                 # 従来のストレージ
-│       └── SaveData.ts          # セーブデータ管理
+│   ├── storage/                 # 従来のストレージ
+│   │   └── SaveData.ts          # セーブデータ管理
+│   └── test/                    # テスト共通ユーティリティ
+│       └── utils/
+│           └── testHelpers.ts   # テストヘルパー・モック・定数
 ├── tests/                       # E2Eテストディレクトリ
 │   └── e2e/                     # E2Eテストファイル
 ├── public/
@@ -274,6 +287,7 @@ quality-prism/
 - `GameProgressRepository`: ゲーム進行データの永続化
 - `GameSettingsRepository`: ゲーム設定の永続化
 - `TextLogRepository`: テキストログの永続化
+- `DexieTextLogRepository`: IndexedDBベースのテキストログ実装
 
 **ドメインサービス**
 - `RouteValidationService`: ルート選択の検証とビジネスルール
@@ -318,7 +332,7 @@ texts:
 - [x] YAMLシナリオローダー
 - [x] セーブデータシステム
 - [x] **DDDアーキテクチャ実装**
-- [x] **包括的テストスイート (212 tests)**
+- [x] **包括的テストスイート (328 tests)**
 - [x] **TDD準拠開発プロセス**
 - [x] **エッジケース・エラーハンドリング**
 - [x] **データ永続化・復元システム**

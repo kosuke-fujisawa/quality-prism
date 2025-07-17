@@ -5,39 +5,17 @@ import type { GameProgressRepository } from '../../domain/repositories/GameProgr
 import type { GameSettingsRepository } from '../../domain/repositories/GameSettingsRepository';
 import { RouteId } from '../../domain/value-objects/RouteId';
 import { GameSettings } from '../../domain/value-objects/GameSettings';
-import { 
-  TEST_CONSTANTS, 
-  createProgressWithClearedRoutes,
-  createProgressWithAllBaseRoutesCleared,
-  expectMessage
-} from '../../test/utils/testHelpers';
+import { TEST_CONSTANTS, mockRepositories, ERROR_MESSAGES, loopHelpers, enhancedAssertions } from '../../test/utils/testHelpers';
 
 describe('GameService', () => {
   let gameService: GameService;
   let mockGameProgressRepository: GameProgressRepository;
   let mockGameSettingsRepository: GameSettingsRepository;
 
-  const createMockRepositories = () => {
-    const mockGameProgressRepository: GameProgressRepository = {
-      getOrCreate: vi.fn(),
-      save: vi.fn(),
-      findById: vi.fn(),
-      delete: vi.fn(),
-    };
-
-    const mockGameSettingsRepository: GameSettingsRepository = {
-      get: vi.fn(),
-      save: vi.fn(),
-      initializeDefault: vi.fn(),
-    };
-
-    return { mockGameProgressRepository, mockGameSettingsRepository };
-  };
-
   beforeEach(() => {
-    const mocks = createMockRepositories();
-    mockGameProgressRepository = mocks.mockGameProgressRepository;
-    mockGameSettingsRepository = mocks.mockGameSettingsRepository;
+    // モックファクトリーを使用
+    mockGameProgressRepository = mockRepositories.createGameProgressRepository();
+    mockGameSettingsRepository = mockRepositories.createGameSettingsRepository();
 
     gameService = new GameService(
       mockGameProgressRepository,
@@ -51,11 +29,11 @@ describe('GameService', () => {
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
-      const result = await gameService.selectRoute(TEST_CONSTANTS.VALID_ROUTES[0]);
+      const result = await gameService.selectRoute(TEST_CONSTANTS.ROUTE1);
 
-      expect(result.success, expectMessage.shouldBeTrue()).toBe(true);
-      expect(mockGameProgressRepository.getOrCreate, expectMessage.operationShould('getOrCreate')).toHaveBeenCalledOnce();
-      expect(mockGameProgressRepository.save, expectMessage.operationShould('save')).toHaveBeenCalledWith(mockProgress);
+      expect(result.success).toBe(true);
+      expect(mockGameProgressRepository.getOrCreate).toHaveBeenCalledOnce();
+      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
     });
 
     it('無効なルートは選択できない', async () => {
@@ -64,9 +42,8 @@ describe('GameService', () => {
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.INVALID_ROUTE);
 
-      expect(result.success, expectMessage.shouldBeFalse()).toBe(false);
-      expect(result.message, expectMessage.shouldEqual('無効なルートです')).toBe('無効なルートです');
-      expect(mockGameProgressRepository.save, expectMessage.operationShouldNot('save')).not.toHaveBeenCalled();
+      enhancedAssertions.expectGameServiceResult(result, false, ERROR_MESSAGES.INVALID_ROUTE);
+      expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
     });
 
     it('トゥルールートは全ルートクリア後のみ選択可能', async () => {
@@ -75,36 +52,40 @@ describe('GameService', () => {
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.TRUE_ROUTE);
 
-      expect(result.success, expectMessage.shouldBeFalse()).toBe(false);
-      expect(result.message, expectMessage.shouldEqual('トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください')).toBe('トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください');
-      expect(mockGameProgressRepository.save, expectMessage.operationShouldNot('save')).not.toHaveBeenCalled();
+      enhancedAssertions.expectGameServiceResult(result, false, 'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください');
+      expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
     });
 
     it('全ルートクリア後はトゥルールートを選択可能', async () => {
-      const mockProgress = createProgressWithAllBaseRoutesCleared();
+      const mockProgress = GameProgress.restore(
+        TEST_CONSTANTS.DEFAULT_TEST_ID,
+        TEST_CONSTANTS.ROUTE1,
+        0,
+        TEST_CONSTANTS.VALID_ROUTES,
+        new Date()
+      );
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.TRUE_ROUTE);
 
-      expect(result.success, expectMessage.shouldBeTrue()).toBe(true);
-      expect(mockGameProgressRepository.save, expectMessage.operationShould('save')).toHaveBeenCalledWith(mockProgress);
+      enhancedAssertions.expectGameServiceResult(result, true);
+      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
     });
 
     it('エラーが発生した場合は適切にハンドリング', async () => {
-      mockGameProgressRepository.getOrCreate = vi.fn().mockRejectedValue(new Error('Database error'));
+      mockGameProgressRepository.getOrCreate = vi.fn().mockRejectedValue(new Error(ERROR_MESSAGES.DATABASE_ERROR));
 
-      const result = await gameService.selectRoute('route1');
+      const result = await gameService.selectRoute(TEST_CONSTANTS.ROUTE1);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toBe('Database error');
+      enhancedAssertions.expectGameServiceResult(result, false, ERROR_MESSAGES.DATABASE_ERROR);
     });
   });
 
   describe('advanceToNextScene', () => {
     it('次のシーンに進める', async () => {
       const mockProgress = GameProgress.createNew('test-id');
-      mockProgress.selectRoute(RouteId.from('route1'));
+      mockProgress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
@@ -117,19 +98,19 @@ describe('GameService', () => {
 
     it('最終シーンでルートクリア', async () => {
       const mockProgress = GameProgress.createNew('test-id');
-      mockProgress.selectRoute(RouteId.from('route1'));
+      mockProgress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       // 最終シーンの手前まで進める
-      for (let i = 0; i < 99; i++) {
-        mockProgress.advanceToNextScene();
-      }
+      loopHelpers.advanceScenes(mockProgress, TEST_CONSTANTS.BEFORE_FINAL_SCENE);
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.advanceToNextScene();
 
-      expect(result.routeCleared).toBe(true);
-      expect(result.currentScene).toBe(100);
-      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
+      enhancedAssertions.expectMultiple([
+        () => expect(result.routeCleared).toBe(true),
+        () => expect(result.currentScene).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER),
+        () => expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress)
+      ]);
     });
   });
 
@@ -137,27 +118,27 @@ describe('GameService', () => {
     it('現在のゲーム状態を取得できる', async () => {
       const mockProgress = GameProgress.restore(
         'test-id',
-        'route1',
+        TEST_CONSTANTS.ROUTE1,
         5,
-        ['route2'],
+        [TEST_CONSTANTS.ROUTE2],
         new Date()
       );
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
 
       const result = await gameService.getCurrentGameState();
 
-      expect(result.currentRoute).toBe('route1');
+      expect(result.currentRoute).toBe(TEST_CONSTANTS.ROUTE1);
       expect(result.currentScene).toBe(5);
-      expect(result.clearedRoutes).toEqual(['route2']);
+      expect(result.clearedRoutes).toEqual([TEST_CONSTANTS.ROUTE2]);
       expect(result.isTrueRouteUnlocked).toBe(false);
     });
 
     it('トゥルールート解放状態を正しく取得', async () => {
       const mockProgress = GameProgress.restore(
         'test-id',
-        'route3',
+        TEST_CONSTANTS.ROUTE3,
         10,
-        ['route1', 'route2', 'route3'],
+        TEST_CONSTANTS.VALID_ROUTES,
         new Date()
       );
       mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
@@ -178,9 +159,13 @@ describe('GameService', () => {
 
       await gameService.performAutoSave();
 
-      expect(mockGameSettingsRepository.get).toHaveBeenCalledOnce();
-      expect(mockGameProgressRepository.getOrCreate).toHaveBeenCalledOnce();
-      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
+      enhancedAssertions.expectRepositoryMockCalls(mockGameSettingsRepository, [
+        { method: 'get', times: 1 }
+      ]);
+      enhancedAssertions.expectRepositoryMockCalls(mockGameProgressRepository, [
+        { method: 'getOrCreate', times: 1 },
+        { method: 'save', times: 1 }
+      ]);
     });
 
     it('オートセーブが無効な場合は保存されない', async () => {
@@ -189,9 +174,13 @@ describe('GameService', () => {
 
       await gameService.performAutoSave();
 
-      expect(mockGameSettingsRepository.get).toHaveBeenCalledOnce();
-      expect(mockGameProgressRepository.getOrCreate).not.toHaveBeenCalled();
-      expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
+      enhancedAssertions.expectRepositoryMockCalls(mockGameSettingsRepository, [
+        { method: 'get', times: 1 }
+      ]);
+      enhancedAssertions.expectRepositoryMockCalls(mockGameProgressRepository, [
+        { method: 'getOrCreate', times: 0 },
+        { method: 'save', times: 0 }
+      ]);
     });
   });
 

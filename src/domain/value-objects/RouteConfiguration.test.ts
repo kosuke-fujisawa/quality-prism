@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { RouteConfiguration } from './RouteConfiguration';
+import { TEST_CONSTANTS, loopHelpers } from '../../test/utils/testHelpers';
 
 describe('RouteConfiguration', () => {
   beforeEach(() => {
@@ -14,8 +15,8 @@ describe('RouteConfiguration', () => {
     it('ベースルートの一覧を取得できる', () => {
       const baseRoutes = RouteConfiguration.getBaseRoutes();
       
-      expect(baseRoutes).toEqual(['route1', 'route2', 'route3']);
-      expect(baseRoutes).toHaveLength(3);
+      expect(baseRoutes).toEqual(TEST_CONSTANTS.VALID_ROUTES);
+      expect(baseRoutes).toHaveLength(TEST_CONSTANTS.VALID_ROUTES.length);
     });
 
     it('返された配列は元の配列と独立している', () => {
@@ -23,7 +24,7 @@ describe('RouteConfiguration', () => {
       baseRoutes.push('newRoute');
       
       const secondCall = RouteConfiguration.getBaseRoutes();
-      expect(secondCall).toEqual(['route1', 'route2', 'route3']);
+      expect(secondCall).toEqual(TEST_CONSTANTS.VALID_ROUTES);
     });
   });
 
@@ -48,7 +49,7 @@ describe('RouteConfiguration', () => {
     it('ベースルートのみの場合', () => {
       const allRoutes = RouteConfiguration.getAllRoutes();
       
-      expect(allRoutes).toEqual(['route1', 'route2', 'route3']);
+      expect(allRoutes).toEqual(TEST_CONSTANTS.VALID_ROUTES);
     });
 
     it('DLCルートを含む場合', () => {
@@ -56,7 +57,7 @@ describe('RouteConfiguration', () => {
       RouteConfiguration.addSpecialRoute('specialRoute1');
       
       const allRoutes = RouteConfiguration.getAllRoutes();
-      expect(allRoutes).toEqual(['route1', 'route2', 'route3', 'dlcRoute1', 'specialRoute1']);
+      expect(allRoutes).toEqual([...TEST_CONSTANTS.VALID_ROUTES, 'dlcRoute1', 'specialRoute1']);
     });
   });
 
@@ -96,13 +97,13 @@ describe('RouteConfiguration', () => {
 
   describe('isValidRoute', () => {
     it('ベースルートは有効', () => {
-      expect(RouteConfiguration.isValidRoute('route1')).toBe(true);
-      expect(RouteConfiguration.isValidRoute('route2')).toBe(true);
-      expect(RouteConfiguration.isValidRoute('route3')).toBe(true);
+      loopHelpers.testForEachRoute(TEST_CONSTANTS.VALID_ROUTES, (route) => {
+        expect(RouteConfiguration.isValidRoute(route)).toBe(true);
+      });
     });
 
     it('トゥルールートは有効', () => {
-      expect(RouteConfiguration.isValidRoute('trueRoute')).toBe(true);
+      expect(RouteConfiguration.isValidRoute(TEST_CONSTANTS.TRUE_ROUTE)).toBe(true);
     });
 
     it('DLCルートは追加後有効', () => {
@@ -119,10 +120,10 @@ describe('RouteConfiguration', () => {
 
   describe('isBaseRoute', () => {
     it('ベースルートの判定が正しい', () => {
-      expect(RouteConfiguration.isBaseRoute('route1')).toBe(true);
-      expect(RouteConfiguration.isBaseRoute('route2')).toBe(true);
-      expect(RouteConfiguration.isBaseRoute('route3')).toBe(true);
-      expect(RouteConfiguration.isBaseRoute('trueRoute')).toBe(false);
+      loopHelpers.testForEachRoute(TEST_CONSTANTS.VALID_ROUTES, (route) => {
+        expect(RouteConfiguration.isBaseRoute(route)).toBe(true);
+      });
+      expect(RouteConfiguration.isBaseRoute(TEST_CONSTANTS.TRUE_ROUTE)).toBe(false);
       expect(RouteConfiguration.isBaseRoute('nonExistent')).toBe(false);
     });
   });
@@ -139,17 +140,15 @@ describe('RouteConfiguration', () => {
 
   describe('isTrueRoute', () => {
     it('トゥルールートの判定が正しい', () => {
-      expect(RouteConfiguration.isTrueRoute('trueRoute')).toBe(true);
-      expect(RouteConfiguration.isTrueRoute('route1')).toBe(false);
+      expect(RouteConfiguration.isTrueRoute(TEST_CONSTANTS.TRUE_ROUTE)).toBe(true);
+      expect(RouteConfiguration.isTrueRoute(TEST_CONSTANTS.VALID_ROUTES[0])).toBe(false);
       expect(RouteConfiguration.isTrueRoute('dlcRoute1')).toBe(false);
     });
   });
 
   describe('isTrueRouteUnlockCondition', () => {
     it('全ベースルートがクリアされている場合はtrue', () => {
-      const clearedRoutes = ['route1', 'route2', 'route3'];
-      
-      expect(RouteConfiguration.isTrueRouteUnlockCondition(clearedRoutes)).toBe(true);
+      expect(RouteConfiguration.isTrueRouteUnlockCondition(TEST_CONSTANTS.VALID_ROUTES)).toBe(true);
     });
 
     it('一部のベースルートがクリアされていない場合はfalse', () => {
@@ -160,7 +159,7 @@ describe('RouteConfiguration', () => {
 
     it('DLCルートがクリアされていても関係ない', () => {
       RouteConfiguration.addDlcRoute('dlcRoute1');
-      const clearedRoutes = ['route1', 'route2', 'route3', 'dlcRoute1'];
+      const clearedRoutes = [...TEST_CONSTANTS.VALID_ROUTES, 'dlcRoute1'];
       
       expect(RouteConfiguration.isTrueRouteUnlockCondition(clearedRoutes)).toBe(true);
     });
@@ -193,7 +192,7 @@ describe('RouteConfiguration', () => {
 
   describe('getTrueRouteName', () => {
     it('トゥルールートの名前を取得できる', () => {
-      expect(RouteConfiguration.getTrueRouteName()).toBe('trueRoute');
+      expect(RouteConfiguration.getTrueRouteName()).toBe(TEST_CONSTANTS.TRUE_ROUTE);
     });
   });
 
@@ -201,13 +200,13 @@ describe('RouteConfiguration', () => {
     it('複数のDLCルートを同時に管理できる', () => {
       const dlcRoutes = ['dlc1', 'dlc2', 'dlc3', 'dlc4', 'dlc5'];
       
-      dlcRoutes.forEach(route => {
+      loopHelpers.testForEachRoute(dlcRoutes, (route) => {
         RouteConfiguration.addDlcRoute(route);
       });
       
       expect(RouteConfiguration.getDlcRoutes()).toEqual(dlcRoutes);
       expect(RouteConfiguration.getAllRoutes()).toEqual([
-        'route1', 'route2', 'route3', ...dlcRoutes
+        ...TEST_CONSTANTS.VALID_ROUTES, ...dlcRoutes
       ]);
     });
 
@@ -216,7 +215,7 @@ describe('RouteConfiguration', () => {
       RouteConfiguration.addSpecialRoute('eventRoute1');
       
       const allRoutes = RouteConfiguration.getAllRoutes();
-      expect(allRoutes).toEqual(['route1', 'route2', 'route3', 'dlcRoute1', 'eventRoute1']);
+      expect(allRoutes).toEqual([...TEST_CONSTANTS.VALID_ROUTES, 'dlcRoute1', 'eventRoute1']);
       
       expect(RouteConfiguration.isDlcRoute('dlcRoute1')).toBe(true);
       expect(RouteConfiguration.isDlcRoute('eventRoute1')).toBe(false);

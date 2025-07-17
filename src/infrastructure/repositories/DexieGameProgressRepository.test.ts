@@ -2,13 +2,6 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DexieGameProgressRepository } from './DexieGameProgressRepository';
 import { GameProgress } from '../../domain/entities/GameProgress';
 import { RouteId } from '../../domain/value-objects/RouteId';
-import { 
-  TEST_CONSTANTS, 
-  createProgressWithRoute, 
-  createProgressWithClearedRoutes,
-  expectMessage,
-  commonAssertions
-} from '../../test/utils/testHelpers';
 
 describe('DexieGameProgressRepository', () => {
   let repository: DexieGameProgressRepository;
@@ -29,28 +22,30 @@ describe('DexieGameProgressRepository', () => {
     it('初回呼び出しで新しいGameProgressを作成する', async () => {
       const progress = await repository.getOrCreate();
 
-      expect(progress, expectMessage.shouldNotBeNull()).toBeInstanceOf(GameProgress);
-      expect(progress.getId(), expectMessage.shouldNotBeUndefined()).toBeDefined();
-      expect(progress.getCurrentRoute().isEmpty(), expectMessage.shouldBeTrue()).toBe(true);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(0)).toBe(0);
-      expect(progress.getClearedRoutes().size, expectMessage.shouldEqual(0)).toBe(0);
+      expect(progress).toBeInstanceOf(GameProgress);
+      expect(progress.getId()).toBeDefined();
+      expect(progress.getCurrentRoute().isEmpty()).toBe(true);
+      expect(progress.getCurrentScene().getValue()).toBe(0);
+      expect(progress.getClearedRoutes().size).toBe(0);
     });
 
     it('二回目以降は同じデータを返す', async () => {
       const progress1 = await repository.getOrCreate();
-      progress1.selectRoute(RouteId.from(TEST_CONSTANTS.VALID_ROUTES[0]));
+      progress1.selectRoute(RouteId.from('route1'));
       await repository.save(progress1);
 
       const progress2 = await repository.getOrCreate();
 
-      expect(progress2.getId(), expectMessage.shouldEqual(progress1.getId())).toBe(progress1.getId());
-      expect(progress2.getCurrentRoute().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.VALID_ROUTES[0])).toBe(TEST_CONSTANTS.VALID_ROUTES[0]);
+      expect(progress2.getId()).toBe(progress1.getId());
+      expect(progress2.getCurrentRoute().getValue()).toBe('route1');
     });
   });
 
   describe('save', () => {
     it('GameProgressを保存できる', async () => {
-      const progress = createProgressWithRoute(TEST_CONSTANTS.VALID_ROUTES[0], 1);
+      const progress = GameProgress.createNew('test-id');
+      progress.selectRoute(RouteId.from('route1'));
+      progress.advanceToNextScene();
 
       await repository.save(progress);
 

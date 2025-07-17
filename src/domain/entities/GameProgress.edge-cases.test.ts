@@ -1,69 +1,66 @@
 import { describe, it, expect } from 'vitest';
 import { GameProgress } from './GameProgress';
 import { RouteId } from '../value-objects/RouteId';
-import { 
-  TEST_CONSTANTS, 
-  createProgressWithRoute, 
-  createProgressWithClearedRoutes,
-  createProgressAtScene,
-  createProgressAtFinalScene,
-  expectMessage,
-  commonAssertions
-} from '../../test/utils/testHelpers';
+import { TEST_CONSTANTS, loopHelpers } from '../../test/utils/testHelpers';
 
 describe('GameProgress エッジケース', () => {
   describe('境界値テスト', () => {
     it('シーン0から開始して正しく進行する', () => {
-      const progress = createProgressWithRoute(TEST_CONSTANTS.VALID_ROUTES[0]);
+      const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
 
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(0)).toBe(0);
+      expect(progress.getCurrentScene().getValue()).toBe(0);
       
       const completed = progress.advanceToNextScene();
-      expect(completed, expectMessage.shouldBeFalse()).toBe(false);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(1)).toBe(1);
+      expect(completed).toBe(false);
+      expect(progress.getCurrentScene().getValue()).toBe(1);
     });
 
     it('最終シーン（99）で次に進むとルートがクリアされる', () => {
-      const progress = createProgressAtFinalScene(TEST_CONSTANTS.VALID_ROUTES[0]);
+      const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.BEFORE_FINAL_SCENE)).toBe(TEST_CONSTANTS.BEFORE_FINAL_SCENE);
+      // シーン99まで進める
+      loopHelpers.advanceScenes(progress, TEST_CONSTANTS.BEFORE_FINAL_SCENE);
+      
+      expect(progress.getCurrentScene().getValue()).toBe(TEST_CONSTANTS.BEFORE_FINAL_SCENE);
       
       const completed = progress.advanceToNextScene();
-      expect(completed, expectMessage.shouldBeTrue()).toBe(true);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
-      expect(progress.isRouteNameCleared(TEST_CONSTANTS.VALID_ROUTES[0]), expectMessage.shouldBeTrue()).toBe(true);
+      expect(completed).toBe(true);
+      expect(progress.getCurrentScene().getValue()).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      expect(progress.isRouteNameCleared(TEST_CONSTANTS.ROUTE1)).toBe(true);
     });
 
     it('シーン100（最終シーン）で次に進んでも状態が変わらない', () => {
-      const progress = createProgressAtScene(TEST_CONSTANTS.VALID_ROUTES[0], TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      // 最終シーンまで進める
+      loopHelpers.advanceScenes(progress, TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      
+      expect(progress.getCurrentScene().getValue()).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       
       // さらに進めても状態は変わらない
       const completed = progress.advanceToNextScene();
-      expect(completed, expectMessage.shouldBeFalse()).toBe(false);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      expect(completed).toBe(false);
+      expect(progress.getCurrentScene().getValue()).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
     });
   });
 
   describe('複数ルートのクリア状態', () => {
     it('同じルートを複数回クリアしても重複しない', () => {
       const progress = GameProgress.createNew('test-id');
-      const route1 = RouteId.from('route1');
+      const route1 = RouteId.from(TEST_CONSTANTS.ROUTE1);
       
       // 1回目のクリア
       progress.selectRoute(route1);
-      for (let i = 0; i < 100; i++) {
-        progress.advanceToNextScene();
-      }
+      loopHelpers.advanceScenes(progress, TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       
       expect(progress.getClearedRoutes().size).toBe(1);
       
       // 2回目のクリア
       progress.selectRoute(route1);
-      for (let i = 0; i < 100; i++) {
-        progress.advanceToNextScene();
-      }
+      loopHelpers.advanceScenes(progress, TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       
       expect(progress.getClearedRoutes().size).toBe(1);
       expect(progress.getClearedRoutes().has(route1)).toBe(true);
@@ -71,13 +68,10 @@ describe('GameProgress エッジケース', () => {
 
     it('3つのルートを段階的にクリアしてトゥルールートが解放される', () => {
       const progress = GameProgress.createNew('test-id');
-      const routes = ['route1', 'route2', 'route3'];
       
-      routes.forEach((routeName, index) => {
+      loopHelpers.testForEachRoute(TEST_CONSTANTS.VALID_ROUTES, (routeName, index) => {
         progress.selectRoute(RouteId.from(routeName));
-        for (let i = 0; i < 100; i++) {
-          progress.advanceToNextScene();
-        }
+        loopHelpers.advanceScenes(progress, TEST_CONSTANTS.FINAL_SCENE_NUMBER);
         
         expect(progress.getClearedRoutes().size).toBe(index + 1);
         expect(progress.isTrueRouteUnlocked()).toBe(index === 2);
@@ -88,11 +82,10 @@ describe('GameProgress エッジケース', () => {
       const progress = GameProgress.createNew('test-id');
       
       // route1とroute2のみクリア
-      ['route1', 'route2'].forEach(routeName => {
+      const partialRoutes = TEST_CONSTANTS.VALID_ROUTES.slice(0, 2);
+      loopHelpers.testForEachRoute(partialRoutes, (routeName) => {
         progress.selectRoute(RouteId.from(routeName));
-        for (let i = 0; i < 100; i++) {
-          progress.advanceToNextScene();
-        }
+        loopHelpers.advanceScenes(progress, TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       });
       
       expect(progress.getClearedRoutes().size).toBe(2);
@@ -104,7 +97,7 @@ describe('GameProgress エッジケース', () => {
     it('無効なシーン番号で復元されても正常に動作する', () => {
       const progress = GameProgress.restore(
         'test-id',
-        'route1',
+        TEST_CONSTANTS.ROUTE1,
         -1, // 無効なシーン番号
         [],
         new Date()
@@ -116,19 +109,19 @@ describe('GameProgress エッジケース', () => {
     it('範囲外のシーン番号で復元されても正常に動作する', () => {
       const progress = GameProgress.restore(
         'test-id',
-        'route1',
+        TEST_CONSTANTS.ROUTE1,
         150, // 範囲外のシーン番号
         [],
         new Date()
       );
       
-      expect(progress.getCurrentScene().getValue()).toBe(100);
+      expect(progress.getCurrentScene().getValue()).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
     });
 
     it('空のクリア済みルート配列で復元できる', () => {
       const progress = GameProgress.restore(
         'test-id',
-        'route1',
+        TEST_CONSTANTS.ROUTE1,
         10,
         [], // 空の配列
         new Date()
@@ -141,15 +134,15 @@ describe('GameProgress エッジケース', () => {
     it('重複するクリア済みルートで復元されても正常に動作する', () => {
       const progress = GameProgress.restore(
         'test-id',
-        'route1',
+        TEST_CONSTANTS.ROUTE1,
         10,
-        ['route1', 'route1', 'route2'], // 重複あり
+        [TEST_CONSTANTS.ROUTE1, TEST_CONSTANTS.ROUTE1, TEST_CONSTANTS.ROUTE2], // 重複あり
         new Date()
       );
       
       expect(progress.getClearedRoutes().size).toBe(2);
-      expect(progress.isRouteNameCleared('route1')).toBe(true);
-      expect(progress.isRouteNameCleared('route2')).toBe(true);
+      expect(progress.isRouteNameCleared(TEST_CONSTANTS.ROUTE1)).toBe(true);
+      expect(progress.isRouteNameCleared(TEST_CONSTANTS.ROUTE2)).toBe(true);
     });
   });
 
@@ -167,7 +160,7 @@ describe('GameProgress エッジケース', () => {
 
     it('同じルートを連続して選択しても正しく動作する', () => {
       const progress = GameProgress.createNew('test-id');
-      const route1 = RouteId.from('route1');
+      const route1 = RouteId.from(TEST_CONSTANTS.ROUTE1);
       
       progress.selectRoute(route1);
       progress.advanceToNextScene();
@@ -184,17 +177,17 @@ describe('GameProgress エッジケース', () => {
     it('異なるルートを選択するとシーンがリセットされる', () => {
       const progress = GameProgress.createNew('test-id');
       
-      progress.selectRoute(RouteId.from('route1'));
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       progress.advanceToNextScene();
       progress.advanceToNextScene();
       
       expect(progress.getCurrentScene().getValue()).toBe(2);
       
       // 異なるルートを選択
-      progress.selectRoute(RouteId.from('route2'));
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE2));
       
       expect(progress.getCurrentScene().getValue()).toBe(0);
-      expect(progress.getCurrentRoute().getValue()).toBe('route2');
+      expect(progress.getCurrentRoute().getValue()).toBe(TEST_CONSTANTS.ROUTE2);
     });
   });
 
@@ -222,18 +215,14 @@ describe('GameProgress エッジケース', () => {
       expect(progress.getSaveTime()).toEqual(specificTime);
     });
 
-    it('ルート選択時に保存時間が更新される', () => {
+    it('ルート選択時に保存時間が更新される', async () => {
       const progress = GameProgress.createNew('test-id');
       const initialSaveTime = progress.getSaveTime();
       
-      // 少し待機
-      const waitTime = 10;
-      const startTime = Date.now();
-      while (Date.now() - startTime < waitTime) {
-        // 待機
-      }
+      // 少し待機（非同期で可読性を向上）
+      await new Promise(resolve => setTimeout(resolve, 10));
       
-      progress.selectRoute(RouteId.from('route1'));
+      progress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       
       expect(progress.getSaveTime().getTime()).toBeGreaterThan(initialSaveTime.getTime());
     });

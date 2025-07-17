@@ -17,11 +17,11 @@ describe('GameProgress', () => {
     it('新しいゲーム進行状況を作成できる', () => {
       const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
 
-      expect(progress.getId(), expectMessage.shouldEqual(TEST_CONSTANTS.DEFAULT_TEST_ID)).toBe(TEST_CONSTANTS.DEFAULT_TEST_ID);
-      expect(progress.getCurrentRoute().getValue(), expectMessage.shouldBeEmpty()).toBe('');
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(0)).toBe(0);
-      expect(progress.getClearedRoutes().size, expectMessage.shouldEqual(0)).toBe(0);
-      expect(progress.isTrueRouteUnlocked(), expectMessage.shouldBeFalse()).toBe(false);
+      expect(progress.getId()).toBe(TEST_CONSTANTS.DEFAULT_TEST_ID);
+      expect(progress.getCurrentRoute().getValue()).toBe('');
+      expect(progress.getCurrentScene().getValue()).toBe(0);
+      expect(progress.getClearedRoutes().size).toBe(0);
+      expect(progress.isTrueRouteUnlocked()).toBe(false);
     });
   });
 
@@ -32,8 +32,8 @@ describe('GameProgress', () => {
 
       progress.selectRoute(routeId);
 
-      expect(progress.getCurrentRoute().equals(routeId), expectMessage.shouldBeTrue()).toBe(true);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(0)).toBe(0);
+      expect(progress.getCurrentRoute().equals(routeId)).toBe(true);
+      expect(progress.getCurrentScene().getValue()).toBe(0);
     });
   });
 
@@ -43,8 +43,8 @@ describe('GameProgress', () => {
 
       const routeCleared = progress.advanceToNextScene();
 
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(1)).toBe(1);
-      expect(routeCleared, expectMessage.shouldBeFalse()).toBe(false);
+      expect(progress.getCurrentScene().getValue()).toBe(1);
+      expect(routeCleared).toBe(false);
     });
 
     it('最終シーンでルートをクリアできる', () => {
@@ -52,8 +52,8 @@ describe('GameProgress', () => {
 
       const routeCleared = progress.advanceToNextScene();
 
-      expect(routeCleared, expectMessage.shouldBeTrue()).toBe(true);
-      expect(progress.isRouteCleared(RouteId.from(TEST_CONSTANTS.VALID_ROUTES[0])), expectMessage.shouldBeTrue()).toBe(true);
+      expect(routeCleared).toBe(true);
+      expect(progress.isRouteCleared(RouteId.from(TEST_CONSTANTS.VALID_ROUTES[0]))).toBe(true);
     });
   });
 
@@ -61,13 +61,13 @@ describe('GameProgress', () => {
     it('全ルートクリア後にトゥルールートが解放される', () => {
       const progress = createProgressWithAllBaseRoutesCleared();
 
-      expect(progress.isTrueRouteUnlocked(), expectMessage.shouldBeTrue()).toBe(true);
+      expect(progress.isTrueRouteUnlocked()).toBe(true);
     });
 
     it('一部のルートのみクリアではトゥルールートは解放されない', () => {
       const progress = createProgressWithClearedRoutes([TEST_CONSTANTS.VALID_ROUTES[0]]);
 
-      expect(progress.isTrueRouteUnlocked(), expectMessage.shouldBeFalse()).toBe(false);
+      expect(progress.isTrueRouteUnlocked()).toBe(false);
     });
   });
 
@@ -81,10 +81,10 @@ describe('GameProgress', () => {
 
       const progress = createRestoredProgress(testId, currentRoute, currentScene, clearedRoutes, saveTime);
 
-      expect(progress.getId(), expectMessage.shouldEqual(testId)).toBe(testId);
-      expect(progress.getCurrentRoute().getValue(), expectMessage.shouldEqual(currentRoute)).toBe(currentRoute);
-      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(currentScene)).toBe(currentScene);
-      expect(progress.isRouteCleared(RouteId.from(clearedRoutes[0])), expectMessage.shouldBeTrue()).toBe(true);
+      expect(progress.getId()).toBe(testId);
+      expect(progress.getCurrentRoute().getValue()).toBe(currentRoute);
+      expect(progress.getCurrentScene().getValue()).toBe(currentScene);
+      expect(progress.isRouteCleared(RouteId.from(clearedRoutes[0]))).toBe(true);
     });
   });
 });
