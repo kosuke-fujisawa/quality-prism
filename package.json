@@ -14,7 +14,9 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "textlint": "textlint --rule preset-ja-technical-writing --plugin yaml 'public/scenarios/*.yaml'",
+    "textlint:fix": "textlint --fix --rule preset-ja-technical-writing --plugin yaml 'public/scenarios/*.yaml'"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.37.0",
@@ -26,6 +28,11 @@
     "fake-indexeddb": "^6.0.1",
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
+    "textlint": "^15.2.0",
+    "textlint-plugin-html": "^1.0.1",
+    "textlint-plugin-yaml": "^0.0.1",
+    "textlint-rule-preset-ja-technical-writing": "^12.0.2",
+    "textlint-rule-preset-japanese": "^10.0.4",
     "typescript": "~5.8.3",
     "vite": "^7.0.4",
     "vitest": "^3.2.4"
