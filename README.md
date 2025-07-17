@@ -180,17 +180,30 @@ texts:
 
 ## 🤝 コントリビューション
 
+このプロジェクトはGit Flowブランチ戦略を採用しています。
+
+### 🌿 ブランチ戦略
+- **main**: 本番環境用安定版
+- **develop**: 開発統合ブランチ  
+- **feature/***: 機能開発ブランチ
+
+### 開発フロー
 1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
+2. `develop`ブランチから機能ブランチを作成
+   ```bash
+   git checkout develop
+   git checkout -b feature/amazing-feature
+   ```
 3. TDD手法に従ってテストを先に作成
-4. 変更をコミット (`git commit -m 'Add amazing feature'`)
+4. 変更をコミット (`git commit -m 'feat: Add amazing feature'`)
 5. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-6. プルリクエストを作成
+6. `develop`ブランチへのプルリクエストを作成
 
 ### 開発時の注意事項
 - 必ずテストを先に書いてください (TDD)
 - 全テストが通ることを確認してからコミット
 - [CLAUDE.md](CLAUDE.md) の開発ガイドラインに従ってください
+- [BRANCHING_STRATEGY.md](BRANCHING_STRATEGY.md) のブランチ運用ルールを遵守してください
 
 ## 📄 ライセンス
 
