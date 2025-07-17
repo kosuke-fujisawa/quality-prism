@@ -1,52 +1,48 @@
 import { describe, it, expect } from 'vitest';
 import { GameProgress } from './GameProgress';
 import { RouteId } from '../value-objects/RouteId';
+import { 
+  TEST_CONSTANTS, 
+  createProgressWithRoute, 
+  createProgressWithClearedRoutes,
+  createProgressAtScene,
+  createProgressAtFinalScene,
+  expectMessage,
+  commonAssertions
+} from '../../test/utils/testHelpers';
 
 describe('GameProgress エッジケース', () => {
   describe('境界値テスト', () => {
     it('シーン0から開始して正しく進行する', () => {
-      const progress = GameProgress.createNew('test-id');
-      progress.selectRoute(RouteId.from('route1'));
+      const progress = createProgressWithRoute(TEST_CONSTANTS.VALID_ROUTES[0]);
 
-      expect(progress.getCurrentScene().getValue()).toBe(0);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(0)).toBe(0);
       
       const completed = progress.advanceToNextScene();
-      expect(completed).toBe(false);
-      expect(progress.getCurrentScene().getValue()).toBe(1);
+      expect(completed, expectMessage.shouldBeFalse()).toBe(false);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(1)).toBe(1);
     });
 
     it('最終シーン（99）で次に進むとルートがクリアされる', () => {
-      const progress = GameProgress.createNew('test-id');
-      progress.selectRoute(RouteId.from('route1'));
+      const progress = createProgressAtFinalScene(TEST_CONSTANTS.VALID_ROUTES[0]);
       
-      // シーン99まで進める
-      for (let i = 0; i < 99; i++) {
-        progress.advanceToNextScene();
-      }
-      
-      expect(progress.getCurrentScene().getValue()).toBe(99);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.BEFORE_FINAL_SCENE)).toBe(TEST_CONSTANTS.BEFORE_FINAL_SCENE);
       
       const completed = progress.advanceToNextScene();
-      expect(completed).toBe(true);
-      expect(progress.getCurrentScene().getValue()).toBe(100);
-      expect(progress.isRouteNameCleared('route1')).toBe(true);
+      expect(completed, expectMessage.shouldBeTrue()).toBe(true);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
+      expect(progress.isRouteNameCleared(TEST_CONSTANTS.VALID_ROUTES[0]), expectMessage.shouldBeTrue()).toBe(true);
     });
 
     it('シーン100（最終シーン）で次に進んでも状態が変わらない', () => {
-      const progress = GameProgress.createNew('test-id');
-      progress.selectRoute(RouteId.from('route1'));
+      const progress = createProgressAtScene(TEST_CONSTANTS.VALID_ROUTES[0], TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       
-      // 最終シーンまで進める
-      for (let i = 0; i < 100; i++) {
-        progress.advanceToNextScene();
-      }
-      
-      expect(progress.getCurrentScene().getValue()).toBe(100);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
       
       // さらに進めても状態は変わらない
       const completed = progress.advanceToNextScene();
-      expect(completed).toBe(false);
-      expect(progress.getCurrentScene().getValue()).toBe(100);
+      expect(completed, expectMessage.shouldBeFalse()).toBe(false);
+      expect(progress.getCurrentScene().getValue(), expectMessage.shouldEqual(TEST_CONSTANTS.FINAL_SCENE_NUMBER)).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER);
     });
   });
 
