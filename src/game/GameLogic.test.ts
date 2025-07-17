@@ -7,8 +7,8 @@ vi.mock('../storage/SaveData', () => ({
   SaveDataDB: vi.fn().mockImplementation(() => ({
     getOrCreateSaveData: vi.fn(),
     updateSaveData: vi.fn(),
-    getSettings: vi.fn()
-  }))
+    getSettings: vi.fn(),
+  })),
 }));
 
 describe('GameLogic', () => {
@@ -19,9 +19,9 @@ describe('GameLogic', () => {
     mockDB = {
       getOrCreateSaveData: vi.fn(),
       updateSaveData: vi.fn(),
-      getSettings: vi.fn()
+      getSettings: vi.fn(),
     };
-    
+
     (SaveDataDB as any).mockImplementation(() => mockDB);
     gameLogic = new GameLogic();
   });
@@ -41,17 +41,17 @@ describe('GameLogic', () => {
         currentRoute: '',
         currentScene: 0,
         clearedRoutes: [],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       const result = await gameLogic.selectRoute('route1');
-      
+
       expect(result).toBe(true);
       expect(gameLogic.currentRoute).toBe('route1');
       expect(gameLogic.currentScene).toBe(0);
       expect(mockDB.updateSaveData).toHaveBeenCalledWith({
         currentRoute: 'route1',
-        currentScene: 0
+        currentScene: 0,
       });
     });
 
@@ -60,11 +60,11 @@ describe('GameLogic', () => {
         currentRoute: '',
         currentScene: 0,
         clearedRoutes: [],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       const result = await gameLogic.selectRoute('invalidRoute');
-      
+
       expect(result).toBe(false);
       expect(gameLogic.currentRoute).toBe('');
     });
@@ -74,11 +74,11 @@ describe('GameLogic', () => {
         currentRoute: '',
         currentScene: 0,
         clearedRoutes: ['route1', 'route2', 'route3'],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       const result = await gameLogic.selectRoute('trueRoute');
-      
+
       expect(result).toBe(true);
       expect(gameLogic.currentRoute).toBe('trueRoute');
     });
@@ -88,11 +88,11 @@ describe('GameLogic', () => {
         currentRoute: '',
         currentScene: 0,
         clearedRoutes: ['route1'],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       const result = await gameLogic.selectRoute('trueRoute');
-      
+
       expect(result).toBe(false);
     });
   });
@@ -103,11 +103,11 @@ describe('GameLogic', () => {
       gameLogic.currentScene = 5;
 
       await gameLogic.nextScene();
-      
+
       expect(gameLogic.currentScene).toBe(6);
       expect(mockDB.updateSaveData).toHaveBeenCalledWith({
         currentRoute: 'route1',
-        currentScene: 6
+        currentScene: 6,
       });
     });
 
@@ -119,14 +119,14 @@ describe('GameLogic', () => {
         currentRoute: 'route1',
         currentScene: 99,
         clearedRoutes: [],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       const isCleared = await gameLogic.nextScene();
-      
+
       expect(isCleared).toBe(true);
       expect(mockDB.updateSaveData).toHaveBeenCalledWith({
-        clearedRoutes: ['route1']
+        clearedRoutes: ['route1'],
       });
     });
   });
@@ -134,24 +134,24 @@ describe('GameLogic', () => {
   describe('オートセーブ', () => {
     it('オートセーブが有効な場合に自動保存される', async () => {
       mockDB.getSettings.mockResolvedValue({
-        autoSave: true
+        autoSave: true,
       });
 
       await gameLogic.autoSave();
-      
+
       expect(mockDB.updateSaveData).toHaveBeenCalledWith({
         currentRoute: gameLogic.currentRoute,
-        currentScene: gameLogic.currentScene
+        currentScene: gameLogic.currentScene,
       });
     });
 
     it('オートセーブが無効な場合は保存されない', async () => {
       mockDB.getSettings.mockResolvedValue({
-        autoSave: false
+        autoSave: false,
       });
 
       await gameLogic.autoSave();
-      
+
       expect(mockDB.updateSaveData).not.toHaveBeenCalled();
     });
   });
@@ -162,11 +162,11 @@ describe('GameLogic', () => {
         currentRoute: 'route2',
         currentScene: 10,
         clearedRoutes: ['route1'],
-        isTrueRouteUnlocked: false
+        isTrueRouteUnlocked: false,
       });
 
       await gameLogic.loadGameState();
-      
+
       expect(gameLogic.currentRoute).toBe('route2');
       expect(gameLogic.currentScene).toBe(10);
     });

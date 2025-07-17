@@ -27,9 +27,12 @@ export interface Scenario {
 export class ScenarioLoader {
   private static scenarios: Map<string, Scenario> = new Map();
 
-  static async loadScenario(route: string, scene: number): Promise<Scenario | null> {
+  static async loadScenario(
+    route: string,
+    scene: number
+  ): Promise<Scenario | null> {
     const key = `${route}_${scene}`;
-    
+
     if (this.scenarios.has(key)) {
       return this.scenarios.get(key)!;
     }
@@ -37,7 +40,7 @@ export class ScenarioLoader {
     try {
       const filename = scene === 0 ? `${route}.yaml` : `${route}_${scene}.yaml`;
       const response = await fetch(`/scenarios/${filename}`);
-      
+
       if (!response.ok) {
         console.warn(`Scenario file not found: ${filename}`);
         return null;
@@ -45,18 +48,18 @@ export class ScenarioLoader {
 
       const yamlText = await response.text();
       const scenarioData = yaml.load(yamlText) as Record<string, unknown>;
-      
+
       // テキストの正規化処理
       const normalizedTexts: ScenarioText[] = [];
       const defaultSpeaker = scenarioData.default_speaker || 'narrator';
-      
+
       if (scenarioData.texts) {
         for (const textItem of scenarioData.texts) {
           if (typeof textItem === 'string') {
             // 単純な文字列の場合はdefault_speakerを使用
             normalizedTexts.push({
               speaker: defaultSpeaker,
-              content: textItem
+              content: textItem,
             });
           } else if (textItem.content) {
             if (Array.isArray(textItem.content)) {
@@ -66,7 +69,7 @@ export class ScenarioLoader {
                   speaker: textItem.speaker || defaultSpeaker,
                   content: content,
                   sprite: textItem.sprite,
-                  voice: textItem.voice
+                  voice: textItem.voice,
                 });
               }
             } else {
@@ -75,13 +78,13 @@ export class ScenarioLoader {
                 speaker: textItem.speaker || defaultSpeaker,
                 content: textItem.content,
                 sprite: textItem.sprite,
-                voice: textItem.voice
+                voice: textItem.voice,
               });
             }
           }
         }
       }
-      
+
       const scenario: Scenario = {
         route: scenarioData.route || route,
         scene: scenarioData.scene || scene,
@@ -89,7 +92,7 @@ export class ScenarioLoader {
         bgm: scenarioData.bgm,
         characters: scenarioData.characters || [],
         texts: normalizedTexts,
-        default_speaker: defaultSpeaker
+        default_speaker: defaultSpeaker,
       };
 
       this.scenarios.set(key, scenario);

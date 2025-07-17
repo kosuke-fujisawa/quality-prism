@@ -36,7 +36,7 @@ texts:
 
       (fetch as any).mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve(mockYamlContent)
+        text: () => Promise.resolve(mockYamlContent),
       });
 
       const scenario = await ScenarioLoader.loadScenario('opening', 1);
@@ -49,12 +49,14 @@ texts:
       expect(scenario?.characters).toHaveLength(1);
       expect(scenario?.characters[0].id).toBe('narrator');
       expect(scenario?.default_speaker).toBe('narrator');
-      
+
       // テキストが正規化されていることを確認
       expect(scenario?.texts).toHaveLength(3); // 配列が展開される
       expect(scenario?.texts[0].speaker).toBe('narrator');
       expect(scenario?.texts[0].content).toBe('品質のプリズム');
-      expect(scenario?.texts[1].content).toBe('それぞれが異なる視点から、品質の本質を探求していく。');
+      expect(scenario?.texts[1].content).toBe(
+        'それぞれが異なる視点から、品質の本質を探求していく。'
+      );
       expect(scenario?.texts[2].speaker).toBe('mentor');
       expect(scenario?.texts[2].sprite).toBe('mentor_thinking.png');
     });
@@ -62,7 +64,7 @@ texts:
     it('should handle file not found', async () => {
       (fetch as any).mockResolvedValueOnce({
         ok: false,
-        status: 404
+        status: 404,
       });
 
       const scenario = await ScenarioLoader.loadScenario('nonexistent', 1);
@@ -72,7 +74,7 @@ texts:
     it('should handle YAML parsing errors', async () => {
       (fetch as any).mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve('invalid: yaml: content:')
+        text: () => Promise.resolve('invalid: yaml: content:'),
       });
 
       const scenario = await ScenarioLoader.loadScenario('invalid', 1);
@@ -90,7 +92,7 @@ texts:
 
       (fetch as any).mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve(mockYamlContent)
+        text: () => Promise.resolve(mockYamlContent),
       });
 
       // 最初の呼び出し
@@ -118,11 +120,11 @@ texts:
 
       (fetch as any).mockResolvedValueOnce({
         ok: true,
-        text: () => Promise.resolve(mockYamlContent)
+        text: () => Promise.resolve(mockYamlContent),
       });
 
       const scenario = await ScenarioLoader.loadScenario('simple', 1);
-      
+
       expect(scenario?.texts).toHaveLength(2);
       expect(scenario?.texts[0].speaker).toBe('narrator');
       expect(scenario?.texts[0].content).toBe('Simple text 1');
@@ -133,22 +135,22 @@ texts:
     it('should generate correct filename for scene 0', async () => {
       (fetch as any).mockResolvedValueOnce({
         ok: false,
-        status: 404
+        status: 404,
       });
 
       await ScenarioLoader.loadScenario('opening', 0);
-      
+
       expect(fetch).toHaveBeenCalledWith('/scenarios/opening.yaml');
     });
 
     it('should generate correct filename for scene > 0', async () => {
       (fetch as any).mockResolvedValueOnce({
         ok: false,
-        status: 404
+        status: 404,
       });
 
       await ScenarioLoader.loadScenario('route1', 5);
-      
+
       expect(fetch).toHaveBeenCalledWith('/scenarios/route1_5.yaml');
     });
   });
@@ -165,7 +167,7 @@ texts:
 
       (fetch as any).mockResolvedValue({
         ok: true,
-        text: () => Promise.resolve(mockYamlContent)
+        text: () => Promise.resolve(mockYamlContent),
       });
 
       // シナリオをロードしてキャッシュに保存

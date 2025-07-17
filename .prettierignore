@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.min.js
+*.min.css
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.vite/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Package managers
+package-lock.json
+yarn.lock
+
+# Config files that should preserve formatting
+*.md

@@ -1,5 +1,5 @@
-import './style.css'
-import { NovelGameApp } from './NovelGameApp'
+import './style.css';
+import { NovelGameApp } from './NovelGameApp';
 
 // アプリケーション開始
 document.addEventListener('DOMContentLoaded', () => {

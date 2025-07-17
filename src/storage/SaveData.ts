@@ -31,8 +31,9 @@ export class SaveDataDB extends Dexie {
   constructor() {
     super('QualityPrismSaveData');
     this.version(1).stores({
-      saveData: '++id, currentRoute, currentScene, clearedRoutes, isTrueRouteUnlocked, lastSaveTime, textLogs',
-      settings: '++id, volume, textSpeed, autoSave'
+      saveData:
+        '++id, currentRoute, currentScene, clearedRoutes, isTrueRouteUnlocked, lastSaveTime, textLogs',
+      settings: '++id, volume, textSpeed, autoSave',
     });
   }
 
@@ -41,16 +42,16 @@ export class SaveDataDB extends Dexie {
     if (existingData.length > 0) {
       return existingData[0];
     }
-    
+
     const newSaveData: SaveData = {
       currentRoute: '',
       currentScene: 0,
       clearedRoutes: [],
       isTrueRouteUnlocked: false,
       lastSaveTime: new Date(),
-      textLogs: []
+      textLogs: [],
     };
-    
+
     await this.saveData.add(newSaveData);
     return newSaveData;
   }
@@ -60,7 +61,7 @@ export class SaveDataDB extends Dexie {
     if (existingData.length > 0) {
       await this.saveData.update(existingData[0].id!, {
         ...data,
-        lastSaveTime: new Date()
+        lastSaveTime: new Date(),
       });
     }
   }
@@ -70,13 +71,13 @@ export class SaveDataDB extends Dexie {
     if (existingSettings.length > 0) {
       return existingSettings[0];
     }
-    
+
     const defaultSettings: GameSettings = {
       volume: 0.8,
       textSpeed: 1.0,
-      autoSave: true
+      autoSave: true,
     };
-    
+
     await this.settings.add(defaultSettings);
     return defaultSettings;
   }
