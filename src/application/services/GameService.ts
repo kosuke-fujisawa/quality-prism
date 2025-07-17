@@ -1,6 +1,7 @@
 import type { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
 import type { GameSettingsRepository } from '../../domain/repositories/GameSettingsRepository';
 import { RouteId } from '../../domain/value-objects/RouteId';
+import { RouteConfiguration } from '../../domain/value-objects/RouteConfiguration';
 
 /**
  * ゲームの主要な操作を提供するアプリケーションサービス
@@ -29,7 +30,7 @@ export class GameService {
       const routeId = RouteId.from(routeName);
 
       // トゥルールートの場合、解放条件をチェック
-      if (routeName === 'trueRoute') {
+      if (RouteConfiguration.isTrueRoute(routeName)) {
         if (!progress.isTrueRouteUnlocked()) {
           return {
             success: false,
@@ -39,8 +40,7 @@ export class GameService {
       }
 
       // 通常ルートの場合、利用可能かチェック
-      const availableRoutes = ['route1', 'route2', 'route3'];
-      if (routeName !== 'trueRoute' && !availableRoutes.includes(routeName)) {
+      if (!RouteConfiguration.isTrueRoute(routeName) && !RouteConfiguration.isValidRoute(routeName)) {
         return {
           success: false,
           message: '無効なルートです',

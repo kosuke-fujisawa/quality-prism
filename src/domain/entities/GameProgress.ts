@@ -1,5 +1,6 @@
 import { RouteId } from '../value-objects/RouteId';
 import { SceneNumber } from '../value-objects/SceneNumber';
+import { RouteConfiguration } from '../value-objects/RouteConfiguration';
 
 /**
  * ゲームの進行状況を表すエンティティ
@@ -79,15 +80,8 @@ export class GameProgress {
    * トゥルールートが解放されているかチェック
    */
   isTrueRouteUnlocked(): boolean {
-    const requiredRoutes = [
-      RouteId.from('route1'),
-      RouteId.from('route2'),
-      RouteId.from('route3'),
-    ];
-
-    return requiredRoutes.every((route) =>
-      Array.from(this.clearedRoutes).some((cleared) => cleared.equals(route))
-    );
+    const clearedRouteNames = Array.from(this.clearedRoutes).map((route) => route.getValue());
+    return RouteConfiguration.isTrueRouteUnlockCondition(clearedRouteNames);
   }
 
   /**

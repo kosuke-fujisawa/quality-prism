@@ -1,12 +1,11 @@
 import { RouteId } from '../value-objects/RouteId';
 import { GameProgress } from '../entities/GameProgress';
+import { RouteConfiguration } from '../value-objects/RouteConfiguration';
 
 /**
  * ルート選択の妥当性を検証するドメインサービス
  */
 export class RouteValidationService {
-  private static readonly AVAILABLE_ROUTES = ['route1', 'route2', 'route3'];
-  private static readonly TRUE_ROUTE = 'trueRoute';
 
   /**
    * ルートが選択可能かどうかを検証
@@ -29,7 +28,7 @@ export class RouteValidationService {
     }
 
     // トゥルールートの場合
-    if (routeValue === this.TRUE_ROUTE) {
+    if (RouteConfiguration.isTrueRoute(routeValue)) {
       return this.validateTrueRoute(progress);
     }
 
@@ -61,7 +60,7 @@ export class RouteValidationService {
     canSelect: boolean;
     reason?: string;
   } {
-    if (!this.AVAILABLE_ROUTES.includes(routeValue)) {
+    if (!RouteConfiguration.isValidRoute(routeValue)) {
       return {
         canSelect: false,
         reason: '存在しないルートです',
@@ -75,13 +74,27 @@ export class RouteValidationService {
    * 利用可能なルート一覧を取得
    */
   static getAvailableRoutes(): string[] {
-    return [...this.AVAILABLE_ROUTES];
+    return RouteConfiguration.getAllRoutes();
+  }
+
+  /**
+   * ベースルートの一覧を取得
+   */
+  static getBaseRoutes(): string[] {
+    return RouteConfiguration.getBaseRoutes();
+  }
+
+  /**
+   * DLCルートの一覧を取得
+   */
+  static getDlcRoutes(): string[] {
+    return RouteConfiguration.getDlcRoutes();
   }
 
   /**
    * トゥルールートの名前を取得
    */
   static getTrueRouteName(): string {
-    return this.TRUE_ROUTE;
+    return RouteConfiguration.getTrueRouteName();
   }
 }
