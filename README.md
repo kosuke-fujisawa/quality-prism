@@ -1,6 +1,6 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-66%2F66%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-212%20total%20|%20197%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
 
@@ -125,12 +125,13 @@ npm run textlint:fix
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 93
-- **成功率**: 100% (93/93)
-- **カバレッジ**: 全主要コンポーネント + DDDレイヤー
+- **総テスト数**: 212
+- **成功率**: 93% (197/212)
+- **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
 ### テストスイート
-#### 既存アーキテクチャ
+
+#### 既存アーキテクチャ (66 tests)
 - `NovelGameApp.test.ts` (11 tests): UI・イベント処理
 - `ChoiceSystem.test.ts` (16 tests): 選択肢・ルート分岐
 - `ScenarioLoader.test.ts` (8 tests): YAMLファイル読み込み
@@ -138,10 +139,28 @@ npm run textlint:fix
 - `TextLog.test.ts` (13 tests): テキストログ
 - `SaveData.test.ts` (8 tests): データ永続化
 
-#### DDDアーキテクチャ
+#### DDDアーキテクチャ - ドメイン層 (76 tests)
 - `GameProgress.test.ts` (7 tests): ゲーム進行エンティティ
+- `GameProgress.edge-cases.test.ts` (16 tests): エッジケース・境界値
+- `TextLogEntry.test.ts` (13 tests): テキストログエンティティ
 - `RouteId.test.ts` (10 tests): ルートID値オブジェクト
+- `RouteId.edge-cases.test.ts` (21 tests): エッジケース・特殊文字
 - `SceneNumber.test.ts` (10 tests): シーン番号値オブジェクト
+- `GameSettings.test.ts` (18 tests): ゲーム設定値オブジェクト
+- `RouteValidationService.test.ts` (9 tests): ルート検証ドメインサービス
+
+#### DDDアーキテクチャ - アプリケーション層 (16 tests)
+- `GameService.test.ts` (16 tests): ゲームアプリケーションサービス
+
+#### DDDアーキテクチャ - インフラストラクチャ層 (26 tests)
+- `DexieGameProgressRepository.test.ts` (12 tests): ゲーム進行リポジトリ
+- `DexieGameSettingsRepository.test.ts` (14 tests): ゲーム設定リポジトリ
+
+#### テスト品質特徴
+- **TDD準拠**: t_wadaさんの推奨手法に基づく
+- **エッジケース網羅**: 境界値・特殊文字・エラー処理
+- **モック使用**: 依存関係の分離とテスト独立性
+- **データ整合性**: 永続化・復元・並行処理の検証
 
 詳細な開発ガイドラインは [CLAUDE.md](CLAUDE.md) を参照してください。
 
@@ -216,6 +235,27 @@ quality-prism/
 - **保守性**: 明確な責任範囲による変更容易性
 - **拡張性**: 新機能追加時のクリーンなアーキテクチャ
 
+#### 実装されたDDDコンポーネント
+**エンティティ**
+- `GameProgress`: ゲーム進行状況の管理（ルート選択、シーン進行、セーブ時間）
+- `TextLogEntry`: テキストログの記録（ルート、シーン、テキスト、タイムスタンプ）
+
+**値オブジェクト**
+- `RouteId`: ルート識別子（不変性・等価性・検証）
+- `SceneNumber`: シーン番号（範囲検証・進行ロジック）
+- `GameSettings`: ゲーム設定（音量・テキスト速度・オートセーブ）
+
+**リポジトリ**
+- `GameProgressRepository`: ゲーム進行データの永続化
+- `GameSettingsRepository`: ゲーム設定の永続化
+- `TextLogRepository`: テキストログの永続化
+
+**ドメインサービス**
+- `RouteValidationService`: ルート選択の検証とビジネスルール
+
+**アプリケーションサービス**
+- `GameService`: ゲームのユースケース実装（ルート選択、シーン進行、設定管理）
+
 ## 🎯 ゲームシステム
 
 ### ルート分岐システム
@@ -252,7 +292,11 @@ texts:
 - [x] 選択肢システム
 - [x] YAMLシナリオローダー
 - [x] セーブデータシステム
-- [x] 包括的テストスイート
+- [x] **DDDアーキテクチャ実装**
+- [x] **包括的テストスイート (212 tests)**
+- [x] **TDD準拠開発プロセス**
+- [x] **エッジケース・エラーハンドリング**
+- [x] **データ永続化・復元システム**
 
 ### 今後の予定 🚀
 - [ ] テキスト送りシステム (クリック/ENTERキー)
@@ -307,6 +351,7 @@ texts:
 - **開発**: Claude Code with Human
 - **TDD指導**: t_wadaさんの推奨手法に基づく
 - **エンジン**: Vite + TypeScript
+- **アーキテクチャ**: DDD (Domain-Driven Design) + TDD
 
 ---
 
