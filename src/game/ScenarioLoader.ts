@@ -44,7 +44,7 @@ export class ScenarioLoader {
       }
 
       const yamlText = await response.text();
-      const scenarioData = yaml.load(yamlText) as any;
+      const scenarioData = yaml.load(yamlText) as Record<string, unknown>;
       
       // テキストの正規化処理
       const normalizedTexts: ScenarioText[] = [];

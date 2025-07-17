@@ -51,6 +51,7 @@ git checkout -b feature/機能名
 # 開発作業...
 # TDDに従ってテストファーストで実装
 npm test  # 全テスト通過確認
+npm run lint  # コード品質確認
 ```
 
 ### 2. プルリクエスト作成
@@ -68,6 +69,7 @@ git push -u origin feature/機能名
   - [ ] 全テスト通過 (66+ tests)
   - [ ] TDD手法に従った実装
   - [ ] TypeScriptエラーなし
+  - [ ] ESLintエラーなし (`npm run lint`)
   - [ ] 適切なエラーハンドリング
   - [ ] ドキュメント更新（必要に応じて）
 
@@ -112,6 +114,7 @@ git push origin main --tags
 #### `feature/*` → `develop`
 - [ ] 全テスト通過
 - [ ] TypeScriptビルド成功
+- [ ] ESLintエラーなし
 - [ ] 新機能のテストカバレッジ追加
 - [ ] コードレビュー承認
 

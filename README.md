@@ -68,6 +68,7 @@ npm run dev
 - **Vitest**: 高速テストフレームワーク
 - **jsdom**: DOM環境シミュレーション
 - **fake-indexeddb**: IndexedBテスト環境
+- **ESLint**: コード品質チェック・自動修正
 
 ## 📋 開発コマンド
 
@@ -89,6 +90,15 @@ npm run test:ui
 
 # テスト実行 (CIモード)
 npm run test:run
+
+# コードlint実行
+npm run lint
+
+# lint自動修正
+npm run lint:fix
+
+# 型チェック実行
+npm run type-check
 ```
 
 ## 🧪 テスト
@@ -202,6 +212,7 @@ texts:
 ### 開発時の注意事項
 - 必ずテストを先に書いてください (TDD)
 - 全テストが通ることを確認してからコミット
+- lintエラーを解消してからコミット (`npm run lint`)
 - [CLAUDE.md](CLAUDE.md) の開発ガイドラインに従ってください
 - [BRANCHING_STRATEGY.md](BRANCHING_STRATEGY.md) のブランチ運用ルールを遵守してください
 

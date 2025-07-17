@@ -3,8 +3,8 @@ import { SaveDataDB } from '../storage/SaveData';
 export class GameLogic {
   private db: SaveDataDB;
   public availableRoutes: string[] = ['route1', 'route2', 'route3'];
-  public currentRoute: string = '';
-  public currentScene: number = 0;
+  public currentRoute = '';
+  public currentScene = 0;
   private readonly SCENES_PER_ROUTE = 100;
 
   constructor() {
