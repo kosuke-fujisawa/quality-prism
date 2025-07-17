@@ -18,7 +18,7 @@ texts:
       - 'ルート1：テスト駆動開発の道'
       - 'テストから始まる開発手法について学ぼう。'
   - speaker: junior
-    content: 'テストから書くんですか。'
+    content: 'テストから書くんですか？'
     sprite: junior_surprised.png
   - speaker: mentor
     content:
