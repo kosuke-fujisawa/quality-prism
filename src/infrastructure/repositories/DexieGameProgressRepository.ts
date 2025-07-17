@@ -1,5 +1,5 @@
 import { GameProgress } from '../../domain/entities/GameProgress';
-import { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
+import type { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
 import { SaveDataDB } from '../persistence/SaveDataDB';
 
 /**
@@ -69,7 +69,11 @@ export class DexieGameProgressRepository implements GameProgressRepository {
     );
   }
 
-  async delete(id: string): Promise<void> {
-    await this.db.saveData.delete(parseInt(id));
+  async delete(id?: string): Promise<void> {
+    if (id) {
+      await this.db.saveData.delete(parseInt(id));
+    } else {
+      await this.db.saveData.clear();
+    }
   }
 }

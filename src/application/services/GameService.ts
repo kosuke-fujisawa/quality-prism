@@ -1,15 +1,21 @@
-import { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
-import { GameSettingsRepository } from '../../domain/repositories/GameSettingsRepository';
+import type { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
+import type { GameSettingsRepository } from '../../domain/repositories/GameSettingsRepository';
 import { RouteId } from '../../domain/value-objects/RouteId';
 
 /**
  * ゲームの主要な操作を提供するアプリケーションサービス
  */
 export class GameService {
+  private gameProgressRepository: GameProgressRepository;
+  private gameSettingsRepository: GameSettingsRepository;
+  
   constructor(
-    private readonly gameProgressRepository: GameProgressRepository,
-    private readonly gameSettingsRepository: GameSettingsRepository
-  ) {}
+    gameProgressRepository: GameProgressRepository,
+    gameSettingsRepository: GameSettingsRepository
+  ) {
+    this.gameProgressRepository = gameProgressRepository;
+    this.gameSettingsRepository = gameSettingsRepository;
+  }
 
   /**
    * ルートを選択する
@@ -18,9 +24,8 @@ export class GameService {
     success: boolean;
     message?: string;
   }> {
-    const progress = await this.gameProgressRepository.getOrCreate();
-
     try {
+      const progress = await this.gameProgressRepository.getOrCreate();
       const routeId = RouteId.from(routeName);
 
       // トゥルールートの場合、解放条件をチェック

@@ -46,6 +46,10 @@ export class GameProgress {
     return new Date(this.lastSaveTime);
   }
 
+  getSaveTime(): Date {
+    return new Date(this.lastSaveTime);
+  }
+
   /**
    * ルートを選択する
    */

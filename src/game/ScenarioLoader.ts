@@ -53,32 +53,33 @@ export class ScenarioLoader {
       const normalizedTexts: ScenarioText[] = [];
       const defaultSpeaker = scenarioData.default_speaker || 'narrator';
 
-      if (scenarioData.texts) {
+      if (scenarioData.texts && Array.isArray(scenarioData.texts)) {
         for (const textItem of scenarioData.texts) {
           if (typeof textItem === 'string') {
             // 単純な文字列の場合はdefault_speakerを使用
             normalizedTexts.push({
-              speaker: defaultSpeaker,
+              speaker: defaultSpeaker as string,
               content: textItem,
             });
-          } else if (textItem.content) {
-            if (Array.isArray(textItem.content)) {
+          } else if (textItem && typeof textItem === 'object' && 'content' in textItem) {
+            const item = textItem as any;
+            if (Array.isArray(item.content)) {
               // 配列の場合は複数のテキストに展開
-              for (const content of textItem.content) {
+              for (const content of item.content) {
                 normalizedTexts.push({
-                  speaker: textItem.speaker || defaultSpeaker,
-                  content: content,
-                  sprite: textItem.sprite,
-                  voice: textItem.voice,
+                  speaker: item.speaker || defaultSpeaker as string,
+                  content: content as string,
+                  sprite: item.sprite as string | undefined,
+                  voice: item.voice as string | undefined,
                 });
               }
             } else {
               // 単一のcontentの場合
               normalizedTexts.push({
-                speaker: textItem.speaker || defaultSpeaker,
-                content: textItem.content,
-                sprite: textItem.sprite,
-                voice: textItem.voice,
+                speaker: item.speaker || defaultSpeaker as string,
+                content: item.content as string,
+                sprite: item.sprite as string | undefined,
+                voice: item.voice as string | undefined,
               });
             }
           }
@@ -86,13 +87,13 @@ export class ScenarioLoader {
       }
 
       const scenario: Scenario = {
-        route: scenarioData.route || route,
-        scene: scenarioData.scene || scene,
-        background: scenarioData.background,
-        bgm: scenarioData.bgm,
-        characters: scenarioData.characters || [],
+        route: scenarioData.route as string || route,
+        scene: scenarioData.scene as number || scene,
+        background: scenarioData.background as string | undefined,
+        bgm: scenarioData.bgm as string | undefined,
+        characters: Array.isArray(scenarioData.characters) ? scenarioData.characters as Character[] : [],
         texts: normalizedTexts,
-        default_speaker: defaultSpeaker,
+        default_speaker: defaultSpeaker as string,
       };
 
       this.scenarios.set(key, scenario);
