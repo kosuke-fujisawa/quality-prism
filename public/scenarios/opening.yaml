@@ -26,5 +26,5 @@ texts:
     content: 'ソフトウェア開発の世界で、品質とは何かを問いかける物語。'
     sprite: mentor_thinking.png
   - speaker: junior
-    content: '三つのルートがあるんですね！'
+    content: '三つのルートがあるんですね。'
     sprite: junior_excited.png
