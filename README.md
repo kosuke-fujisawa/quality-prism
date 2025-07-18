@@ -1,6 +1,6 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-328%20total%20|%20328%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-342%20total%20|%20342%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
 
@@ -10,11 +10,13 @@
 ## ✨ 特徴
 
 - 🧪 **TDD開発**: t_wadaさんの推奨するTest-Driven Developmentで構築
+- 🏗️ **DDD アーキテクチャ**: Domain-Driven Design による設計
 - 📱 **レスポンシブUI**: Canvas APIによる滑らかな描画
 - 🎮 **インタラクティブ**: クリック・キーボード操作対応
 - 💾 **永続化**: IndexedDBによるセーブデータ管理
 - 📝 **YAML駆動**: シナリオファイルによる柔軟なコンテンツ管理
 - 🔀 **マルチルート**: 選択肢に基づく分岐ストーリー
+- 🧪 **高品質**: 342テスト・100%成功率
 
 ## 🚀 クイックスタート
 
@@ -136,13 +138,29 @@ npm run textlint
 npm run textlint:fix
 ```
 
+## 🔒 セキュリティ
+
+### 依存関係セキュリティ
+- **npm audit**: 依存関係の脆弱性チェック
+- **定期的な更新**: 依存関係の手動更新・監視
+
+```bash
+# セキュリティ監査実行
+npm audit
+
+# 依存関係の脆弱性チェック
+npm audit --audit-level high
+```
+
 ## 🧪 テスト
 
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 328
-- **成功率**: 100% (328/328)
+- **総テスト数**: 342
+- **成功率**: 100% (342/342)
+- **単体テスト**: 328テスト (23ファイル)
+- **E2Eテスト**: 14テスト (2ファイル)
 - **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
 ### テストスイート
@@ -178,10 +196,10 @@ npm run textlint:fix
 - `DexieGameSettingsRepository.test.ts` (14 tests): ゲーム設定リポジトリ
 - `DexieTextLogRepository.test.ts` (15 tests): テキストログリポジトリ
 
-#### E2Eテスト (Playwright)
-- **ユーザーシナリオ**: 実際のブラウザ環境でのゲーム動作検証
-- **統合テスト**: 全レイヤーの協調動作テスト
-- **UI操作テスト**: ゲームアプリケーションの実際の操作フロー
+#### E2Eテスト (Playwright) - 14 tests
+- `basic.spec.ts` (8 tests): 基本動作・UI操作・モード遷移
+- `ddd-integration.spec.ts` (6 tests): DDDアーキテクチャ統合・永続化・エラーハンドリング
+
 
 #### テスト品質特徴
 - **TDD準拠**: t_wadaさんの推奨手法に基づく

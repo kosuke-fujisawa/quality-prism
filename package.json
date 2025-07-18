@@ -20,8 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
-    "textlint": "textlint --plugin yaml --rule sentence-length --rule max-ten --rule no-hankaku-kana 'public/scenarios/*.yaml'",
-    "textlint:fix": "textlint --fix --plugin yaml --rule sentence-length --rule max-ten --rule no-hankaku-kana 'public/scenarios/*.yaml'"
+    "textlint": "textlint --rule sentence-length --rule max-ten --rule no-hankaku-kana 'public/scenarios/*.yaml'",
+    "textlint:fix": "textlint --fix --rule sentence-length --rule max-ten --rule no-hankaku-kana 'public/scenarios/*.yaml'"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1",
@@ -35,8 +35,6 @@
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "textlint": "^15.2.0",
-    "textlint-plugin-html": "^1.0.1",
-    "textlint-plugin-yaml": "^0.0.1",
     "textlint-rule-preset-ja-technical-writing": "^12.0.2",
     "textlint-rule-preset-japanese": "^10.0.4",
     "typescript": "~5.8.3",
