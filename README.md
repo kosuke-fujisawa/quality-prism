@@ -1,6 +1,6 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-342%20total%20|%20342%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-425%20total%20|%20425%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
 
@@ -16,7 +16,8 @@
 - 💾 **永続化**: IndexedDBによるセーブデータ管理
 - 📝 **YAML駆動**: シナリオファイルによる柔軟なコンテンツ管理
 - 🔀 **マルチルート**: 選択肢に基づく分岐ストーリー
-- 🧪 **高品質**: 342テスト・100%成功率
+- 🧪 **高品質**: 425テスト・100%成功率
+- 📊 **ロギング**: エンタープライズレベルの監視・デバッグ機能
 
 ## 🚀 クイックスタート
 
@@ -79,6 +80,35 @@ npm run dev
 - **ESLint**: コード品質チェック・自動修正
 - **Prettier**: コードフォーマット自動化
 - **textlint**: シナリオテキスト品質チェック
+
+## 📚 ドキュメント・Wiki
+
+### GitHub Wiki (包括的開発ドキュメント)
+プロジェクトの詳細な技術ドキュメントは [**GitHub Wiki**](https://github.com/kosuke-fujisawa/quality-prism/wiki) で参照できます：
+
+#### 🏗️ アーキテクチャ・設計
+- **[DDD Architecture](https://github.com/kosuke-fujisawa/quality-prism/wiki/DDD-Architecture)** - Domain-Driven Design 実装詳細
+- **[Logging System](https://github.com/kosuke-fujisawa/quality-prism/wiki/Logging-System)** - 89テスト完成のエンタープライズロギング
+- **[TDD Guidelines](https://github.com/kosuke-fujisawa/quality-prism/wiki/TDD-Guidelines)** - テスト駆動開発実践指針
+
+#### 🛠️ 開発・運用
+- **[Development Setup](https://github.com/kosuke-fujisawa/quality-prism/wiki/Development-Setup)** - 開発環境構築完全ガイド
+- **[Test Strategy](https://github.com/kosuke-fujisawa/quality-prism/wiki/Test-Strategy)** - 425テストの体系的戦略
+
+### ローカルWikiコンテンツ
+Wikiコンテンツのソースファイルは `wiki-content/` ディレクトリにあります：
+- `Home.md` - Wikiメインページ
+- `DDD-Architecture.md` - DDDアーキテクチャ詳細
+- `TDD-Guidelines.md` - TDD開発指針
+- `Development-Setup.md` - 環境構築ガイド
+- `Test-Strategy.md` - テスト戦略
+- `Logging-System.md` - ロギングシステム
+
+### Wiki手動作成手順
+1. [GitHub Wiki](https://github.com/kosuke-fujisawa/quality-prism/wiki) にアクセス
+2. "Create the first page" をクリック
+3. `wiki-content/Home.md` の内容をコピー&ペーストしてホームページを作成
+4. 各 `.md` ファイルの内容で対応するWikiページを作成
 
 ## 📋 開発コマンド
 
@@ -157,9 +187,9 @@ npm audit --audit-level high
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 342
-- **成功率**: 100% (342/342)
-- **単体テスト**: 328テスト (23ファイル)
+- **総テスト数**: 425
+- **成功率**: 100% (425/425)
+- **単体テスト**: 411テスト (30ファイル)
 - **E2Eテスト**: 14テスト (2ファイル)
 - **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
@@ -173,7 +203,7 @@ npm audit --audit-level high
 - `TextLog.test.ts` (13 tests): テキストログ
 - `SaveData.test.ts` (8 tests): データ永続化
 
-#### DDDアーキテクチャ - ドメイン層 (139 tests)
+#### DDDアーキテクチャ - ドメイン層 (150 tests)
 - `GameProgress.test.ts` (7 tests): ゲーム進行エンティティ
 - `GameProgress.edge-cases.test.ts` (16 tests): エッジケース・境界値
 - `TextLogEntry.test.ts` (13 tests): テキストログエンティティ
@@ -186,15 +216,22 @@ npm audit --audit-level high
 - `RouteConfiguration.test.ts` (26 tests): ルート設定管理
 - `RouteConfiguration.extensibility.test.ts` (14 tests): 拡張性・柔軟性テスト
 - `RouteValidationService.test.ts` (9 tests): ルート検証ドメインサービス
+- `ILogger.test.ts` (11 tests): ロガーインターフェース・型定義
+- `GameLogger.test.ts` (11 tests): ゲーム専用ロガー
 
 #### DDDアーキテクチャ - アプリケーション層 (31 tests)
 - `GameService.test.ts` (16 tests): ゲームアプリケーションサービス
 - `GameService.edge-cases.test.ts` (15 tests): 非同期エラー・競合状態・タイムアウト
 
-#### DDDアーキテクチャ - インフラストラクチャ層 (41 tests)
+#### DDDアーキテクチャ - インフラストラクチャ層 (108 tests)
 - `DexieGameProgressRepository.test.ts` (12 tests): ゲーム進行リポジトリ
 - `DexieGameSettingsRepository.test.ts` (14 tests): ゲーム設定リポジトリ
 - `DexieTextLogRepository.test.ts` (15 tests): テキストログリポジトリ
+- `BaseLogger.test.ts` (15 tests): 基盤ロガー実装
+- `ConsoleAppender.test.ts` (12 tests): コンソール出力・フォーマッター
+- `IndexedDBAppender.test.ts` (6 tests): 永続化ログ・検索機能
+- `RepositoryLogger.test.ts` (16 tests): セキュアDB操作ログ
+- `LoggerFactory.test.ts` (18 tests): 環境対応ファクトリー
 
 #### E2Eテスト (Playwright) - 14 tests
 - `basic.spec.ts` (8 tests): 基本動作・UI操作・モード遷移
