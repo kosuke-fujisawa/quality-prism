@@ -1,4 +1,4 @@
-import { GameLogic } from './game/GameLogic';
+import { GameLogicDDD } from './game/GameLogicDDD';
 import { TextLog } from './game/TextLog';
 
 export class NovelGameApp {
@@ -7,11 +7,11 @@ export class NovelGameApp {
   private currentOptions: string[] = [];
   private gameState: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' =
     'menu';
-  private gameLogic: GameLogic;
+  private gameLogic: GameLogicDDD;
   private textLog: TextLog;
 
   constructor() {
-    this.gameLogic = new GameLogic();
+    this.gameLogic = new GameLogicDDD();
     this.textLog = new TextLog();
 
     this.canvas = document.querySelector<HTMLCanvasElement>('#gameCanvas')!;
@@ -46,7 +46,7 @@ export class NovelGameApp {
   private setupEventListeners(): void {
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', async (e) => {
       if (e.key === 'Escape') {
         if (this.gameState !== 'menu') {
           this.showMainMenu();
@@ -54,13 +54,13 @@ export class NovelGameApp {
       } else if (this.gameState === 'menu' && /^[1-5]$/.test(e.key)) {
         const index = parseInt(e.key) - 1;
         if (index >= 0 && index < this.currentOptions.length) {
-          this.selectMenuOption(this.currentOptions[index]);
+          await this.selectMenuOption(this.currentOptions[index]);
         }
       }
     });
   }
 
-  private handleClick(e: MouseEvent): void {
+  private async handleClick(e: MouseEvent): Promise<void> {
     const rect = this.canvas.getBoundingClientRect();
     const y = e.clientY - rect.top;
 
@@ -74,7 +74,7 @@ export class NovelGameApp {
         const itemBottom = itemY + 25; // テキストより下25px
 
         if (y >= itemTop && y <= itemBottom) {
-          this.selectMenuOption(this.currentOptions[i]);
+          await this.selectMenuOption(this.currentOptions[i]);
           break;
         }
       }
@@ -85,13 +85,19 @@ export class NovelGameApp {
     try {
       switch (option) {
         case 'start':
-          await this.gameLogic.selectRoute('opening');
-          this.gameState = 'game';
-          this.showMessage(
-            `ゲーム開始！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`
-          );
+          const startSuccess = await this.gameLogic.selectRoute('route1');
+          if (startSuccess) {
+            this.gameState = 'game';
+            this.showMessage(
+              `ゲーム開始！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`
+            );
+          } else {
+            this.showMessage('ゲームを開始できませんでした');
+          }
           break;
         case 'load':
+          // 最新のゲーム状態を読み込み
+          await this.gameLogic.loadGameState();
           this.gameState = 'game';
           if (this.gameLogic.currentRoute === '') {
             this.showMessage('セーブデータがありません');
