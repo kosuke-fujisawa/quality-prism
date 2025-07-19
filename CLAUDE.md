@@ -4,6 +4,17 @@
 
 このプロジェクトは **t_wadaさんの推奨するTDD (Test-Driven Development)** と **DDD (Domain-Driven Design)** アーキテクチャを組み合わせて開発を進めています。
 
+### Claude Code応答スタイル
+開発支援AIは **理系女子大学院生** のペルソナで応答します：
+
+- **技術的正確性**: 専門知識に基づいた正確な情報提供
+- **親しみやすさ**: 丁寧で分かりやすい説明
+- **探究心**: 新技術への好奇心と実験的アプローチ
+- **論理性**: データと事実に基づいた判断
+- **謙虚さ**: 研究者らしい姿勢での技術検討
+
+設定詳細は `.claude/settings.local.json` で管理されています。
+
 ### TDD開発サイクル
 1. **Red**: 失敗するテストを書く
 2. **Green**: テストを通す最小限のコードを書く
@@ -29,9 +40,9 @@
 npm test
 ```
 
-- **総テスト数**: 342
-- **成功率**: 100% (342/342)
-- **単体テスト**: 328テスト (23ファイル)
+- **総テスト数**: 425
+- **成功率**: 100% (425/425)
+- **単体テスト**: 411テスト (30ファイル)
 - **E2Eテスト**: 14テスト (2ファイル)
 
 ### テストカバレッジ
@@ -44,7 +55,7 @@ npm test
 - `TextLog.test.ts`: 13 tests - テキストログ
 - `SaveData.test.ts`: 8 tests - データ永続化
 
-#### DDDアーキテクチャ - ドメイン層 (139 tests)
+#### DDDアーキテクチャ - ドメイン層 (150 tests)
 - `GameProgress.test.ts`: 7 tests - ゲーム進行エンティティ
 - `GameProgress.edge-cases.test.ts`: 16 tests - エッジケース・境界値
 - `TextLogEntry.test.ts`: 13 tests - テキストログエンティティ
@@ -57,15 +68,25 @@ npm test
 - `RouteConfiguration.test.ts`: 26 tests - ルート設定管理
 - `RouteConfiguration.extensibility.test.ts`: 14 tests - 拡張性・柔軟性テスト
 - `RouteValidationService.test.ts`: 9 tests - ルート検証ドメインサービス
+- `ILogger.test.ts`: 11 tests - ロガーインターフェース・型定義・ログレベル検証
+- `GameLogger.test.ts`: 11 tests - ゲーム専用ロガー・アクション記録・パフォーマンス監視
 
 #### DDDアーキテクチャ - アプリケーション層 (31 tests)
 - `GameService.test.ts`: 16 tests - ゲームアプリケーションサービス
 - `GameService.edge-cases.test.ts`: 15 tests - 非同期エラー・競合状態・タイムアウト
 
-#### DDDアーキテクチャ - インフラストラクチャ層 (41 tests)
+#### DDDアーキテクチャ - インフラストラクチャ層 (108 tests)
 - `DexieGameProgressRepository.test.ts`: 12 tests - ゲーム進行リポジトリ
 - `DexieGameSettingsRepository.test.ts`: 14 tests - ゲーム設定リポジトリ
 - `DexieTextLogRepository.test.ts`: 15 tests - テキストログリポジトリ
+
+#### ロギングシステム (89 tests) - エンタープライズレベル監視機能
+- `BaseLogger.test.ts`: 15 tests - 基盤ロガー・レベルフィルタリング・エラー耐性
+- `ConsoleAppender.test.ts`: 12 tests - コンソール出力・JSON/人間可読フォーマッター
+- `IndexedDBAppender.test.ts`: 6 tests - 永続化ログ・検索・自動削除機能
+- `RepositoryLogger.test.ts`: 16 tests - セキュアDB操作ログ・機密情報マスキング
+- `LoggerFactory.test.ts`: 18 tests - 環境対応ファクトリー・シングルトンパターン
+- `LoggingIntegration.example.ts`: 22 tests - DDD統合パターン・実用例
 
 #### E2Eテスト (Playwright) - 14 tests
 - **基本動作テスト** (`basic.spec.ts`): 8 tests
