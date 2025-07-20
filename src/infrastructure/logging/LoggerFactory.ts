@@ -1,9 +1,9 @@
-import {
+import type {
   ILogger,
   IGameLogger,
   IRepositoryLogger,
-  LogLevel,
 } from '../../domain/interfaces/ILogger';
+import { LogLevel } from '../../domain/interfaces/ILogger';
 import { BaseLogger } from './BaseLogger';
 import { GameLogger } from '../../domain/services/GameLogger';
 import { RepositoryLogger } from './RepositoryLogger';
@@ -47,7 +47,7 @@ export class LoggerFactory {
   /**
    * 基本ロガーを作成
    */
-  createLogger(name?: string): ILogger {
+  createLogger(_name?: string): ILogger {
     const appenders = this.createAppenders();
     const logger = new BaseLogger(appenders, this.logLevel);
     return logger;

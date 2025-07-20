@@ -1,9 +1,20 @@
-import {
+import type {
   ILogAppender,
   ILogFormatter,
   LogEntry,
-  LogLevel,
 } from '../../domain/interfaces/ILogger';
+import { LogLevel } from '../../domain/interfaces/ILogger';
+
+// ログレベルの名前を取得するヘルパー関数
+function getLogLevelName(level: number): string {
+  switch (level) {
+    case LogLevel.DEBUG: return 'DEBUG';
+    case LogLevel.INFO: return 'INFO';
+    case LogLevel.WARN: return 'WARN';
+    case LogLevel.ERROR: return 'ERROR';
+    default: return 'UNKNOWN';
+  }
+}
 
 /**
  * コンソール出力アペンダー
@@ -49,7 +60,7 @@ export class JsonLogFormatter implements ILogFormatter {
   format(entry: LogEntry): string {
     const logObject = {
       timestamp: entry.timestamp.toISOString(),
-      level: LogLevel[entry.level],
+      level: getLogLevelName(entry.level),
       message: entry.message,
       context: entry.context,
       error: entry.error
@@ -71,7 +82,7 @@ export class JsonLogFormatter implements ILogFormatter {
 export class HumanReadableLogFormatter implements ILogFormatter {
   format(entry: LogEntry): string {
     const timestamp = entry.timestamp.toISOString();
-    const level = LogLevel[entry.level].padEnd(5);
+    const level = getLogLevelName(entry.level).padEnd(5);
     const context = entry.context
       ? ` [${this.formatContext(entry.context)}]`
       : '';

@@ -1,10 +1,10 @@
-import {
+import type {
   ILogger,
-  LogLevel,
   LogContext,
   LogEntry,
   ILogAppender,
 } from '../../domain/interfaces/ILogger';
+import { LogLevel } from '../../domain/interfaces/ILogger';
 
 /**
  * 基本ロガー実装

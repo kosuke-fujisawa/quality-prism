@@ -1,8 +1,8 @@
-import {
+import type {
   IRepositoryLogger,
   LogContext,
-  LogLayer,
 } from '../../domain/interfaces/ILogger';
+import { LogLayer } from '../../domain/interfaces/ILogger';
 import { BaseLogger } from './BaseLogger';
 
 /**

@@ -1,4 +1,4 @@
-import {
+import type {
   ILogAppender,
   LogEntry,
 } from '../../domain/interfaces/ILogger';

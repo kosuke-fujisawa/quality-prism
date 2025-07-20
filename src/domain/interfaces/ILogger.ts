@@ -3,19 +3,23 @@
  * DDDアーキテクチャでのロギング抽象化
  */
 
-export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-}
+export const LogLevel = {
+  DEBUG: 0,
+  INFO: 1,
+  WARN: 2,
+  ERROR: 3,
+} as const;
 
-export enum LogLayer {
-  DOMAIN = 'domain',
-  APPLICATION = 'application',
-  INFRASTRUCTURE = 'infrastructure',
-  PRESENTATION = 'presentation',
-}
+export type LogLevel = typeof LogLevel[keyof typeof LogLevel];
+
+export const LogLayer = {
+  DOMAIN: 'domain',
+  APPLICATION: 'application',
+  INFRASTRUCTURE: 'infrastructure',
+  PRESENTATION: 'presentation',
+} as const;
+
+export type LogLayer = typeof LogLayer[keyof typeof LogLayer];
 
 export interface LogContext {
   userId?: string;

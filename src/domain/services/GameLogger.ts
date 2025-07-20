@@ -1,9 +1,9 @@
-import {
+import type {
   IGameLogger,
   LogContext,
   GameLogContext,
-  LogLayer,
 } from '../interfaces/ILogger';
+import { LogLayer } from '../interfaces/ILogger';
 import { BaseLogger } from '../../infrastructure/logging/BaseLogger';
 
 /**
