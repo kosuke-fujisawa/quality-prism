@@ -99,9 +99,8 @@ describe('NovelGameApp - ロード機能統合テスト', () => {
 
       // セーブデータリストサービスでエラーが発生する状況をモック
       const mockError = new Error('Database error');
-      vi.spyOn(app as any, 'saveDataListService').mockImplementation(() => ({
-        getSaveDataList: vi.fn().mockRejectedValue(mockError),
-      }));
+      const mockService = (app as any).saveDataListService;
+      vi.spyOn(mockService, 'getSaveDataList').mockRejectedValue(mockError);
 
       // Act
       await (app as any).selectMenuOption('load');
