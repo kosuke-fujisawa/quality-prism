@@ -50,7 +50,7 @@ describe('DexieTextLogRepository', () => {
           RouteId.from(TEST_CONSTANTS.ROUTE2),
           SceneNumber.from(1),
           'メッセージ3'
-        )
+        ),
       ];
 
       for (const entry of entries) {
@@ -71,19 +71,19 @@ describe('DexieTextLogRepository', () => {
         'route1のメッセージ1'
       );
       await repository.save(entry1);
-      
+
       // 少し時間をおいて次のエントリを作成
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const entry2 = TextLogEntry.create(
         RouteId.from(TEST_CONSTANTS.ROUTE1),
         SceneNumber.from(2),
         'route1のメッセージ2'
       );
       await repository.save(entry2);
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const entry3 = TextLogEntry.create(
         RouteId.from(TEST_CONSTANTS.ROUTE2),
         SceneNumber.from(1),
@@ -93,8 +93,10 @@ describe('DexieTextLogRepository', () => {
     });
 
     it('指定されたルートのテキストログを取得できる', async () => {
-      const route1Entries = await repository.findByRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
-      
+      const route1Entries = await repository.findByRoute(
+        RouteId.from(TEST_CONSTANTS.ROUTE1)
+      );
+
       expect(route1Entries).toHaveLength(2);
       expect(route1Entries[0].getText()).toBe('route1のメッセージ1');
       expect(route1Entries[1].getText()).toBe('route1のメッセージ2');
@@ -115,18 +117,18 @@ describe('DexieTextLogRepository', () => {
         'route1-scene1のメッセージ1'
       );
       await repository.save(entry1);
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const entry2 = TextLogEntry.create(
         RouteId.from(TEST_CONSTANTS.ROUTE1),
         SceneNumber.from(1),
         'route1-scene1のメッセージ2'
       );
       await repository.save(entry2);
-      
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const entry3 = TextLogEntry.create(
         RouteId.from(TEST_CONSTANTS.ROUTE1),
         SceneNumber.from(2),
@@ -140,7 +142,7 @@ describe('DexieTextLogRepository', () => {
         RouteId.from(TEST_CONSTANTS.ROUTE1),
         SceneNumber.from(1)
       );
-      
+
       expect(entries).toHaveLength(2);
       expect(entries[0].getText()).toBe('route1-scene1のメッセージ1');
       expect(entries[1].getText()).toBe('route1-scene1のメッセージ2');
@@ -167,7 +169,7 @@ describe('DexieTextLogRepository', () => {
           RouteId.from(TEST_CONSTANTS.ROUTE2),
           SceneNumber.from(1),
           'メッセージ2'
-        )
+        ),
       ];
 
       for (const entry of entries) {
@@ -202,7 +204,7 @@ describe('DexieTextLogRepository', () => {
           RouteId.from(TEST_CONSTANTS.ROUTE2),
           SceneNumber.from(1),
           'route2のメッセージ1'
-        )
+        ),
       ];
 
       for (const entry of entries) {
@@ -213,8 +215,12 @@ describe('DexieTextLogRepository', () => {
     it('指定されたルートのテキストログを削除できる', async () => {
       await repository.deleteByRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
 
-      const route1Entries = await repository.findByRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
-      const route2Entries = await repository.findByRoute(RouteId.from(TEST_CONSTANTS.ROUTE2));
+      const route1Entries = await repository.findByRoute(
+        RouteId.from(TEST_CONSTANTS.ROUTE1)
+      );
+      const route2Entries = await repository.findByRoute(
+        RouteId.from(TEST_CONSTANTS.ROUTE2)
+      );
 
       expect(route1Entries).toHaveLength(0);
       expect(route2Entries).toHaveLength(1);
@@ -222,9 +228,9 @@ describe('DexieTextLogRepository', () => {
 
     it('存在しないルートの削除は何もしない', async () => {
       const beforeCount = (await repository.findAll()).length;
-      
+
       await repository.deleteByRoute(RouteId.from('nonexistent'));
-      
+
       const afterCount = (await repository.findAll()).length;
       expect(afterCount).toBe(beforeCount);
     });
@@ -242,7 +248,7 @@ describe('DexieTextLogRepository', () => {
           RouteId.from(TEST_CONSTANTS.ROUTE2),
           SceneNumber.from(1),
           'メッセージ2'
-        )
+        ),
       ];
 
       for (const entry of entries) {
@@ -257,7 +263,7 @@ describe('DexieTextLogRepository', () => {
 
     it('空の状態での削除は何もしない', async () => {
       await repository.deleteAll();
-      
+
       const allEntries = await repository.findAll();
       expect(allEntries).toHaveLength(0);
     });
@@ -283,7 +289,7 @@ describe('DexieTextLogRepository', () => {
   describe('パフォーマンステスト', () => {
     it('大量のデータの保存と取得', async () => {
       const entries: TextLogEntry[] = [];
-      
+
       // 100個のエントリを作成
       for (let i = 0; i < 100; i++) {
         entries.push(
@@ -328,7 +334,9 @@ describe('DexieTextLogRepository', () => {
 
       // 特定のルートでの検索パフォーマンス
       const start = performance.now();
-      const route1Entries = await repository.findByRoute(RouteId.from('route1'));
+      const route1Entries = await repository.findByRoute(
+        RouteId.from('route1')
+      );
       const end = performance.now();
 
       expect(route1Entries).toHaveLength(20);

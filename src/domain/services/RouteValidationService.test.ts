@@ -9,7 +9,10 @@ describe('RouteValidationService', () => {
       const emptyRoute = RouteId.empty();
       const progress = GameProgress.createNew('test-id');
 
-      const result = RouteValidationService.canSelectRoute(emptyRoute, progress);
+      const result = RouteValidationService.canSelectRoute(
+        emptyRoute,
+        progress
+      );
 
       expect(result.canSelect).toBe(false);
       expect(result.reason).toBe('ルートが指定されていません');
@@ -19,7 +22,10 @@ describe('RouteValidationService', () => {
       const validRoute = RouteId.from('route1');
       const progress = GameProgress.createNew('test-id');
 
-      const result = RouteValidationService.canSelectRoute(validRoute, progress);
+      const result = RouteValidationService.canSelectRoute(
+        validRoute,
+        progress
+      );
 
       expect(result.canSelect).toBe(true);
       expect(result.reason).toBeUndefined();
@@ -29,7 +35,10 @@ describe('RouteValidationService', () => {
       const invalidRoute = RouteId.from('invalid-route');
       const progress = GameProgress.createNew('test-id');
 
-      const result = RouteValidationService.canSelectRoute(invalidRoute, progress);
+      const result = RouteValidationService.canSelectRoute(
+        invalidRoute,
+        progress
+      );
 
       expect(result.canSelect).toBe(false);
       expect(result.reason).toBe('存在しないルートです');

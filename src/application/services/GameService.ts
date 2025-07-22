@@ -9,7 +9,7 @@ import { RouteConfiguration } from '../../domain/value-objects/RouteConfiguratio
 export class GameService {
   private gameProgressRepository: GameProgressRepository;
   private gameSettingsRepository: GameSettingsRepository;
-  
+
   constructor(
     gameProgressRepository: GameProgressRepository,
     gameSettingsRepository: GameSettingsRepository
@@ -34,13 +34,17 @@ export class GameService {
         if (!progress.isTrueRouteUnlocked()) {
           return {
             success: false,
-            message: 'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください',
+            message:
+              'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください',
           };
         }
       }
 
       // 通常ルートの場合、利用可能かチェック
-      if (routeName !== 'trueRoute' && !RouteConfiguration.isValidRoute(routeName)) {
+      if (
+        routeName !== 'trueRoute' &&
+        !RouteConfiguration.isValidRoute(routeName)
+      ) {
         return {
           success: false,
           message: '無効なルートです',

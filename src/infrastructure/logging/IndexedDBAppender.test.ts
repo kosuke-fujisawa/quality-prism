@@ -43,7 +43,7 @@ class MockIDBObjectStore {
 
   delete(key: any) {
     return new MockIDBRequest(() => {
-      const index = this.data.findIndex(item => item.id === key);
+      const index = this.data.findIndex((item) => item.id === key);
       if (index !== -1) {
         this.data.splice(index, 1);
       }
@@ -70,13 +70,18 @@ class MockIDBObjectStore {
         return new MockIDBRequest(() => {
           const sorted = [...this.data].sort((a, b) => {
             if (direction === 'prev') {
-              return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+              return (
+                new Date(b.timestamp).getTime() -
+                new Date(a.timestamp).getTime()
+              );
             }
-            return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+            return (
+              new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            );
           });
           return new MockIDBCursor(sorted);
         });
-      }
+      },
     };
   }
 }
@@ -138,13 +143,13 @@ describe('IndexedDBAppender', () => {
           }
         }, 0);
         return request;
-      })
+      }),
     };
 
     // グローバルのwindowオブジェクトにモックを設定
     Object.defineProperty(global, 'window', {
       value: { indexedDB: mockIndexedDB },
-      writable: true
+      writable: true,
     });
   });
 
@@ -157,18 +162,18 @@ describe('IndexedDBAppender', () => {
   describe('初期化', () => {
     it('IndexedDBが利用可能な場合は正常に初期化される', async () => {
       appender = new IndexedDBAppender();
-      
+
       // 初期化完了を待機
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       expect(mockIndexedDB.open).toHaveBeenCalledWith('gameLogsDB', 1);
     });
 
     it('カスタムパラメータで初期化できる', async () => {
       appender = new IndexedDBAppender('customDB', 'customStore', 500);
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       expect(mockIndexedDB.open).toHaveBeenCalledWith('customDB', 1);
     });
   });
@@ -176,7 +181,7 @@ describe('IndexedDBAppender', () => {
   describe('ログエントリの追加', () => {
     beforeEach(async () => {
       appender = new IndexedDBAppender();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('ログエントリを正常に追加できる', async () => {
@@ -187,13 +192,13 @@ describe('IndexedDBAppender', () => {
         context: {
           layer: LogLayer.DOMAIN,
           operation: 'test',
-        }
+        },
       };
 
       await appender.append(entry);
-      
+
       // IndexedDBの操作は非同期なので少し待機
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('エラー情報を含むログエントリを追加できる', async () => {
@@ -206,12 +211,12 @@ describe('IndexedDBAppender', () => {
         context: {
           layer: LogLayer.DOMAIN,
           operation: 'test-error',
-        }
+        },
       };
 
       await appender.append(entry);
-      
-      await new Promise(resolve => setTimeout(resolve, 100));
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
   });
 
@@ -220,11 +225,11 @@ describe('IndexedDBAppender', () => {
       // IndexedDBを無効化
       Object.defineProperty(global, 'window', {
         value: undefined,
-        writable: true
+        writable: true,
       });
 
       appender = new IndexedDBAppender();
-      
+
       const entry: LogEntry = {
         level: LogLevel.INFO,
         message: 'Test message',
@@ -243,23 +248,23 @@ describe('IndexedDBAppender', () => {
             throw new Error('DB initialization failed');
           });
           return request;
-        })
+        }),
       };
 
       Object.defineProperty(global, 'window', {
         value: { indexedDB: failingIndexedDB },
-        writable: true
+        writable: true,
       });
 
       appender = new IndexedDBAppender();
-      
+
       const entry: LogEntry = {
         level: LogLevel.INFO,
         message: 'Test message',
         timestamp: new Date(),
       };
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       await expect(appender.append(entry)).resolves.toBeUndefined();
     }, 1000);
   });
@@ -267,7 +272,7 @@ describe('IndexedDBAppender', () => {
   describe('ログ検索', () => {
     beforeEach(async () => {
       appender = new IndexedDBAppender();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('デフォルトでログを検索できる', async () => {
@@ -280,7 +285,7 @@ describe('IndexedDBAppender', () => {
         level: LogLevel.WARN,
         from: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24時間前
         to: new Date(),
-        limit: 50
+        limit: 50,
       };
 
       const results = await appender.searchLogs(criteria);
@@ -291,7 +296,7 @@ describe('IndexedDBAppender', () => {
   describe('ログクリア', () => {
     beforeEach(async () => {
       appender = new IndexedDBAppender();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('全ログエントリを削除できる', async () => {
@@ -302,7 +307,7 @@ describe('IndexedDBAppender', () => {
   describe('接続管理', () => {
     beforeEach(async () => {
       appender = new IndexedDBAppender();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('接続を正常に閉じることができる', () => {

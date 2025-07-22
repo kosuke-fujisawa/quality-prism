@@ -142,8 +142,16 @@ describe('ロガーインターフェース', () => {
         warn: (message: string, context?: LogContext) => {},
         error: (message: string, error?: Error, context?: LogContext) => {},
         logGameAction: (action: string, context?: GameLogContext) => {},
-        logStateChange: (from: string, to: string, context?: GameLogContext) => {},
-        logPerformance: (operation: string, duration: number, context?: LogContext) => {},
+        logStateChange: (
+          from: string,
+          to: string,
+          context?: GameLogContext
+        ) => {},
+        logPerformance: (
+          operation: string,
+          duration: number,
+          context?: LogContext
+        ) => {},
       };
 
       expect(typeof mockGameLogger.logGameAction).toBe('function');
@@ -160,8 +168,16 @@ describe('ロガーインターフェース', () => {
         warn: (message: string, context?: LogContext) => {},
         error: (message: string, error?: Error, context?: LogContext) => {},
         logQuery: (repository: string, operation: string, params?: any) => {},
-        logQueryResult: (repository: string, operation: string, resultCount: number) => {},
-        logQueryError: (repository: string, operation: string, error: Error) => {},
+        logQueryResult: (
+          repository: string,
+          operation: string,
+          resultCount: number
+        ) => {},
+        logQueryError: (
+          repository: string,
+          operation: string,
+          error: Error
+        ) => {},
       };
 
       expect(typeof mockRepoLogger.logQuery).toBe('function');

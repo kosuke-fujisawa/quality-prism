@@ -71,15 +71,17 @@ describe('DexieGameProgressRepository', () => {
     it('保存時間が更新される', async () => {
       const progress = GameProgress.createNew('test-id');
       const originalSaveTime = progress.getSaveTime();
-      
+
       // 少し待機してから保存
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       progress.selectRoute(RouteId.from('route1'));
       await repository.save(progress);
 
       const savedProgress = await repository.getOrCreate();
-      expect(savedProgress.getSaveTime().getTime()).toBeGreaterThan(originalSaveTime.getTime());
+      expect(savedProgress.getSaveTime().getTime()).toBeGreaterThan(
+        originalSaveTime.getTime()
+      );
     });
   });
 
@@ -122,13 +124,13 @@ describe('DexieGameProgressRepository', () => {
   describe('データ整合性', () => {
     it('複数のルートをクリアした状態を正しく保存・復元', async () => {
       const progress = GameProgress.createNew('test-id');
-      
+
       // route1をクリア
       progress.selectRoute(RouteId.from('route1'));
       for (let i = 0; i < 100; i++) {
         progress.advanceToNextScene();
       }
-      
+
       // route2をクリア
       progress.selectRoute(RouteId.from('route2'));
       for (let i = 0; i < 100; i++) {
@@ -145,9 +147,9 @@ describe('DexieGameProgressRepository', () => {
 
     it('トゥルールート解放状態を正しく保存・復元', async () => {
       const progress = GameProgress.createNew('test-id');
-      
+
       // 全ルートをクリア
-      ['route1', 'route2', 'route3'].forEach(routeName => {
+      ['route1', 'route2', 'route3'].forEach((routeName) => {
         progress.selectRoute(RouteId.from(routeName));
         for (let i = 0; i < 100; i++) {
           progress.advanceToNextScene();

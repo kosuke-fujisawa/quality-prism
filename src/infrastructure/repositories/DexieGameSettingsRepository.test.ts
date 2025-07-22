@@ -164,7 +164,7 @@ describe('DexieGameSettingsRepository', () => {
       await Promise.all([
         repository.save(settings1),
         repository.save(settings2),
-        repository.save(settings3)
+        repository.save(settings3),
       ]);
 
       const finalSettings = await repository.get();
@@ -180,7 +180,7 @@ describe('DexieGameSettingsRepository', () => {
       // 正常なケースでの動作を確認
       const settings = new GameSettings(0.5, 1.0, true);
       await expect(repository.save(settings)).resolves.not.toThrow();
-      
+
       const retrievedSettings = await repository.get();
       expect(retrievedSettings.getVolume()).toBe(0.5);
     });

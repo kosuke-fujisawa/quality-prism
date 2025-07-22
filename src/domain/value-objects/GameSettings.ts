@@ -14,7 +14,7 @@ export class GameSettings {
     if (isNaN(textSpeed)) {
       throw new Error('テキスト速度は有効な数値でなければなりません');
     }
-    
+
     // Infinity値の検証
     if (!isFinite(volume)) {
       throw new Error('音量は有限の数値でなければなりません');
@@ -22,7 +22,7 @@ export class GameSettings {
     if (!isFinite(textSpeed)) {
       throw new Error('テキスト速度は有限の数値でなければなりません');
     }
-    
+
     // 範囲値の検証
     if (volume < 0 || volume > 1) {
       throw new Error('音量は0.0から1.0の間でなければなりません');

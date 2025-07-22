@@ -62,7 +62,8 @@ describe('RepositoryLogger', () => {
       expect(mockAppender.append).toHaveBeenCalledWith(
         expect.objectContaining({
           level: LogLevel.DEBUG,
-          message: 'Repository result: GameProgressRepository.findAll returned 5 items',
+          message:
+            'Repository result: GameProgressRepository.findAll returned 5 items',
           context: expect.objectContaining({
             layer: LogLayer.INFRASTRUCTURE,
             operation: 'repository-result',
@@ -144,7 +145,11 @@ describe('RepositoryLogger', () => {
 
   describe('キャッシュ操作ログ', () => {
     it('キャッシュヒットをログできる', () => {
-      repositoryLogger.logCacheOperation('GameProgressRepository', 'hit', 'user-123');
+      repositoryLogger.logCacheOperation(
+        'GameProgressRepository',
+        'hit',
+        'user-123'
+      );
 
       expect(mockAppender.append).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -161,7 +166,10 @@ describe('RepositoryLogger', () => {
     });
 
     it('キーなしでキャッシュ操作をログできる', () => {
-      repositoryLogger.logCacheOperation('GameProgressRepository', 'invalidate');
+      repositoryLogger.logCacheOperation(
+        'GameProgressRepository',
+        'invalidate'
+      );
 
       expect(mockAppender.append).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -185,12 +193,17 @@ describe('RepositoryLogger', () => {
         memoryUsage: 1024,
       };
 
-      repositoryLogger.logPerformanceMetrics('GameProgressRepository', 'findAll', metrics);
+      repositoryLogger.logPerformanceMetrics(
+        'GameProgressRepository',
+        'findAll',
+        metrics
+      );
 
       expect(mockAppender.append).toHaveBeenCalledWith(
         expect.objectContaining({
           level: LogLevel.DEBUG,
-          message: 'Repository performance: GameProgressRepository.findAll took 200ms',
+          message:
+            'Repository performance: GameProgressRepository.findAll took 200ms',
           context: expect.objectContaining({
             metadata: expect.objectContaining({
               repository: 'GameProgressRepository',
@@ -207,12 +220,17 @@ describe('RepositoryLogger', () => {
     it('遅い操作はWARNレベルでログする', () => {
       const metrics = { duration: 800 };
 
-      repositoryLogger.logPerformanceMetrics('GameProgressRepository', 'complexQuery', metrics);
+      repositoryLogger.logPerformanceMetrics(
+        'GameProgressRepository',
+        'complexQuery',
+        metrics
+      );
 
       expect(mockAppender.append).toHaveBeenCalledWith(
         expect.objectContaining({
           level: LogLevel.WARN,
-          message: 'Slow repository operation: GameProgressRepository.complexQuery took 800ms',
+          message:
+            'Slow repository operation: GameProgressRepository.complexQuery took 800ms',
         })
       );
     });

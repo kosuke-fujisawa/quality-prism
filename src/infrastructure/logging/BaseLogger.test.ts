@@ -151,7 +151,9 @@ describe('BaseLogger', () => {
           throw new Error('Appender error');
         }),
       };
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       logger.addAppender(faultyAppender);
       logger.info('test message');
@@ -209,8 +211,11 @@ describe('BaseLogger', () => {
       logger.info('test message');
       const after = new Date();
 
-      const logEntry = (mockAppender.append as any).mock.calls[0][0] as LogEntry;
-      expect(logEntry.timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime());
+      const logEntry = (mockAppender.append as any).mock
+        .calls[0][0] as LogEntry;
+      expect(logEntry.timestamp.getTime()).toBeGreaterThanOrEqual(
+        before.getTime()
+      );
       expect(logEntry.timestamp.getTime()).toBeLessThanOrEqual(after.getTime());
     });
   });

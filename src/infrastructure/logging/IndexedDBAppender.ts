@@ -1,7 +1,4 @@
-import type {
-  ILogAppender,
-  LogEntry,
-} from '../../domain/interfaces/ILogger';
+import type { ILogAppender, LogEntry } from '../../domain/interfaces/ILogger';
 
 /**
  * IndexedDBアペンダー
@@ -14,11 +11,7 @@ export class IndexedDBAppender implements ILogAppender {
   private db: IDBDatabase | null = null;
   private isInitialized = false;
 
-  constructor(
-    dbName: string = 'gameLogsDB',
-    storeName: string = 'logs',
-    maxEntries: number = 1000
-  ) {
+  constructor(dbName = 'gameLogsDB', storeName = 'logs', maxEntries = 1000) {
     this.dbName = dbName;
     this.storeName = storeName;
     this.maxEntries = maxEntries;
@@ -38,18 +31,20 @@ export class IndexedDBAppender implements ILogAppender {
     try {
       const transaction = this.db.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
-      
+
       const logRecord = {
         id: Date.now() + Math.random(),
         timestamp: entry.timestamp.toISOString(),
         level: entry.level,
         message: entry.message,
         context: entry.context,
-        error: entry.error ? {
-          name: entry.error.name,
-          message: entry.error.message,
-          stack: entry.error.stack,
-        } : undefined,
+        error: entry.error
+          ? {
+              name: entry.error.name,
+              message: entry.error.message,
+              stack: entry.error.stack,
+            }
+          : undefined,
       };
 
       await new Promise<void>((resolve, reject) => {
@@ -77,20 +72,22 @@ export class IndexedDBAppender implements ILogAppender {
     try {
       this.db = await new Promise<IDBDatabase>((resolve, reject) => {
         const request = window.indexedDB.open(this.dbName, 1);
-        
+
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
-        
+
         request.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
           if (!db.objectStoreNames.contains(this.storeName)) {
-            const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
+            const store = db.createObjectStore(this.storeName, {
+              keyPath: 'id',
+            });
             store.createIndex('timestamp', 'timestamp', { unique: false });
             store.createIndex('level', 'level', { unique: false });
           }
         };
       });
-      
+
       this.isInitialized = true;
     } catch (error) {
       console.error('Failed to initialize IndexedDB:', error);
@@ -103,9 +100,9 @@ export class IndexedDBAppender implements ILogAppender {
   private async waitForInitialization(): Promise<void> {
     const maxWait = 5000; // 5秒
     const startTime = Date.now();
-    
+
     while (!this.isInitialized && Date.now() - startTime < maxWait) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 
@@ -119,7 +116,7 @@ export class IndexedDBAppender implements ILogAppender {
       const transaction = this.db.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
       const index = store.index('timestamp');
-      
+
       const countRequest = store.count();
       const count = await new Promise<number>((resolve, reject) => {
         countRequest.onsuccess = () => resolve(countRequest.result);
@@ -133,7 +130,8 @@ export class IndexedDBAppender implements ILogAppender {
 
         await new Promise<void>((resolve, reject) => {
           cursorRequest.onsuccess = (event) => {
-            const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
+              .result;
             if (cursor && deletedCount < deleteCount) {
               store.delete(cursor.primaryKey);
               deletedCount++;
@@ -167,24 +165,25 @@ export class IndexedDBAppender implements ILogAppender {
       const transaction = this.db.transaction([this.storeName], 'readonly');
       const store = transaction.objectStore(this.storeName);
       const index = store.index('timestamp');
-      
+
       const results: any[] = [];
       const limit = criteria.limit || 100;
 
       await new Promise<void>((resolve, reject) => {
         const cursorRequest = index.openCursor(null, 'prev'); // 新しい順
-        
+
         cursorRequest.onsuccess = (event) => {
-          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+          const cursor = (event.target as IDBRequest<IDBCursorWithValue>)
+            .result;
           if (cursor && results.length < limit) {
             const record = cursor.value;
-            
+
             // フィルタ条件をチェック
             if (criteria.level && record.level < criteria.level) {
               cursor.continue();
               return;
             }
-            
+
             if (criteria.from || criteria.to) {
               const timestamp = new Date(record.timestamp);
               if (criteria.from && timestamp < criteria.from) {
@@ -196,14 +195,14 @@ export class IndexedDBAppender implements ILogAppender {
                 return;
               }
             }
-            
+
             results.push(record);
             cursor.continue();
           } else {
             resolve();
           }
         };
-        
+
         cursorRequest.onerror = () => reject(cursorRequest.error);
       });
 
@@ -223,7 +222,7 @@ export class IndexedDBAppender implements ILogAppender {
     try {
       const transaction = this.db.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
-      
+
       await new Promise<void>((resolve, reject) => {
         const request = store.clear();
         request.onsuccess = () => resolve();

@@ -7,7 +7,7 @@ export class RouteConfiguration {
     baseRoutes: ['route1', 'route2', 'route3'],
     dlcRoutes: [] as string[],
     trueRoute: 'trueRoute',
-    specialRoutes: [] as string[]
+    specialRoutes: [] as string[],
   };
 
   /**
@@ -17,7 +17,7 @@ export class RouteConfiguration {
     return [
       ...this.config.baseRoutes,
       ...this.config.dlcRoutes,
-      ...this.config.specialRoutes
+      ...this.config.specialRoutes,
     ];
   }
 
@@ -71,8 +71,10 @@ export class RouteConfiguration {
    * ルートが存在するかどうかを判定
    */
   static isValidRoute(routeName: string): boolean {
-    return this.getAllRoutes().includes(routeName) || 
-           routeName === this.config.trueRoute;
+    return (
+      this.getAllRoutes().includes(routeName) ||
+      routeName === this.config.trueRoute
+    );
   }
 
   /**
@@ -101,7 +103,7 @@ export class RouteConfiguration {
    * （全ベースルートがクリアされている）
    */
   static isTrueRouteUnlockCondition(clearedRoutes: string[]): boolean {
-    return this.config.baseRoutes.every(baseRoute => 
+    return this.config.baseRoutes.every((baseRoute) =>
       clearedRoutes.includes(baseRoute)
     );
   }

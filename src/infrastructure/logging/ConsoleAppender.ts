@@ -8,11 +8,16 @@ import { LogLevel } from '../../domain/interfaces/ILogger';
 // ログレベルの名前を取得するヘルパー関数
 function getLogLevelName(level: number): string {
   switch (level) {
-    case LogLevel.DEBUG: return 'DEBUG';
-    case LogLevel.INFO: return 'INFO';
-    case LogLevel.WARN: return 'WARN';
-    case LogLevel.ERROR: return 'ERROR';
-    default: return 'UNKNOWN';
+    case LogLevel.DEBUG:
+      return 'DEBUG';
+    case LogLevel.INFO:
+      return 'INFO';
+    case LogLevel.WARN:
+      return 'WARN';
+    case LogLevel.ERROR:
+      return 'ERROR';
+    default:
+      return 'UNKNOWN';
   }
 }
 

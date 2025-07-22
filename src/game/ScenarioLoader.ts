@@ -61,13 +61,17 @@ export class ScenarioLoader {
               speaker: defaultSpeaker as string,
               content: textItem,
             });
-          } else if (textItem && typeof textItem === 'object' && 'content' in textItem) {
+          } else if (
+            textItem &&
+            typeof textItem === 'object' &&
+            'content' in textItem
+          ) {
             const item = textItem as any;
             if (Array.isArray(item.content)) {
               // 配列の場合は複数のテキストに展開
               for (const content of item.content) {
                 normalizedTexts.push({
-                  speaker: item.speaker || defaultSpeaker as string,
+                  speaker: item.speaker || (defaultSpeaker as string),
                   content: content as string,
                   sprite: item.sprite as string | undefined,
                   voice: item.voice as string | undefined,
@@ -76,7 +80,7 @@ export class ScenarioLoader {
             } else {
               // 単一のcontentの場合
               normalizedTexts.push({
-                speaker: item.speaker || defaultSpeaker as string,
+                speaker: item.speaker || (defaultSpeaker as string),
                 content: item.content as string,
                 sprite: item.sprite as string | undefined,
                 voice: item.voice as string | undefined,
@@ -87,11 +91,13 @@ export class ScenarioLoader {
       }
 
       const scenario: Scenario = {
-        route: scenarioData.route as string || route,
-        scene: scenarioData.scene as number || scene,
+        route: (scenarioData.route as string) || route,
+        scene: (scenarioData.scene as number) || scene,
         background: scenarioData.background as string | undefined,
         bgm: scenarioData.bgm as string | undefined,
-        characters: Array.isArray(scenarioData.characters) ? scenarioData.characters as Character[] : [],
+        characters: Array.isArray(scenarioData.characters)
+          ? (scenarioData.characters as Character[])
+          : [],
         texts: normalizedTexts,
         default_speaker: defaultSpeaker as string,
       };

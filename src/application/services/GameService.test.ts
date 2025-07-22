@@ -5,7 +5,13 @@ import type { GameProgressRepository } from '../../domain/repositories/GameProgr
 import type { GameSettingsRepository } from '../../domain/repositories/GameSettingsRepository';
 import { RouteId } from '../../domain/value-objects/RouteId';
 import { GameSettings } from '../../domain/value-objects/GameSettings';
-import { TEST_CONSTANTS, mockRepositories, ERROR_MESSAGES, loopHelpers, enhancedAssertions } from '../../test/utils/testHelpers';
+import {
+  TEST_CONSTANTS,
+  mockRepositories,
+  ERROR_MESSAGES,
+  loopHelpers,
+  enhancedAssertions,
+} from '../../test/utils/testHelpers';
 
 describe('GameService', () => {
   let gameService: GameService;
@@ -14,8 +20,10 @@ describe('GameService', () => {
 
   beforeEach(() => {
     // モックファクトリーを使用
-    mockGameProgressRepository = mockRepositories.createGameProgressRepository();
-    mockGameSettingsRepository = mockRepositories.createGameSettingsRepository();
+    mockGameProgressRepository =
+      mockRepositories.createGameProgressRepository();
+    mockGameSettingsRepository =
+      mockRepositories.createGameSettingsRepository();
 
     gameService = new GameService(
       mockGameProgressRepository,
@@ -25,34 +33,58 @@ describe('GameService', () => {
 
   describe('selectRoute', () => {
     it('有効なルートを選択できる', async () => {
-      const mockProgress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      const mockProgress = GameProgress.createNew(
+        TEST_CONSTANTS.DEFAULT_TEST_ID
+      );
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.ROUTE1);
 
       expect(result.success).toBe(true);
       expect(mockGameProgressRepository.getOrCreate).toHaveBeenCalledOnce();
-      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
+      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(
+        mockProgress
+      );
     });
 
     it('無効なルートは選択できない', async () => {
-      const mockProgress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      const mockProgress = GameProgress.createNew(
+        TEST_CONSTANTS.DEFAULT_TEST_ID
+      );
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
 
-      const result = await gameService.selectRoute(TEST_CONSTANTS.INVALID_ROUTE);
+      const result = await gameService.selectRoute(
+        TEST_CONSTANTS.INVALID_ROUTE
+      );
 
-      enhancedAssertions.expectGameServiceResult(result, false, ERROR_MESSAGES.INVALID_ROUTE);
+      enhancedAssertions.expectGameServiceResult(
+        result,
+        false,
+        ERROR_MESSAGES.INVALID_ROUTE
+      );
       expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
     });
 
     it('トゥルールートは全ルートクリア後のみ選択可能', async () => {
-      const mockProgress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      const mockProgress = GameProgress.createNew(
+        TEST_CONSTANTS.DEFAULT_TEST_ID
+      );
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.TRUE_ROUTE);
 
-      enhancedAssertions.expectGameServiceResult(result, false, 'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください');
+      enhancedAssertions.expectGameServiceResult(
+        result,
+        false,
+        'トゥルールートを解放するには、すべてのベースルート（route1, route2, route3）をクリアしてください'
+      );
       expect(mockGameProgressRepository.save).not.toHaveBeenCalled();
     });
 
@@ -64,21 +96,31 @@ describe('GameService', () => {
         TEST_CONSTANTS.VALID_ROUTES,
         new Date()
       );
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.TRUE_ROUTE);
 
       enhancedAssertions.expectGameServiceResult(result, true);
-      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
+      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(
+        mockProgress
+      );
     });
 
     it('エラーが発生した場合は適切にハンドリング', async () => {
-      mockGameProgressRepository.getOrCreate = vi.fn().mockRejectedValue(new Error(ERROR_MESSAGES.DATABASE_ERROR));
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockRejectedValue(new Error(ERROR_MESSAGES.DATABASE_ERROR));
 
       const result = await gameService.selectRoute(TEST_CONSTANTS.ROUTE1);
 
-      enhancedAssertions.expectGameServiceResult(result, false, ERROR_MESSAGES.DATABASE_ERROR);
+      enhancedAssertions.expectGameServiceResult(
+        result,
+        false,
+        ERROR_MESSAGES.DATABASE_ERROR
+      );
     });
   });
 
@@ -86,30 +128,43 @@ describe('GameService', () => {
     it('次のシーンに進める', async () => {
       const mockProgress = GameProgress.createNew('test-id');
       mockProgress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.advanceToNextScene();
 
       expect(result.currentScene).toBe(1);
       expect(result.routeCleared).toBe(false);
-      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress);
+      expect(mockGameProgressRepository.save).toHaveBeenCalledWith(
+        mockProgress
+      );
     });
 
     it('最終シーンでルートクリア', async () => {
       const mockProgress = GameProgress.createNew('test-id');
       mockProgress.selectRoute(RouteId.from(TEST_CONSTANTS.ROUTE1));
       // 最終シーンの手前まで進める
-      loopHelpers.advanceScenes(mockProgress, TEST_CONSTANTS.BEFORE_FINAL_SCENE);
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      loopHelpers.advanceScenes(
+        mockProgress,
+        TEST_CONSTANTS.BEFORE_FINAL_SCENE
+      );
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       const result = await gameService.advanceToNextScene();
 
       enhancedAssertions.expectMultiple([
         () => expect(result.routeCleared).toBe(true),
-        () => expect(result.currentScene).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER),
-        () => expect(mockGameProgressRepository.save).toHaveBeenCalledWith(mockProgress)
+        () =>
+          expect(result.currentScene).toBe(TEST_CONSTANTS.FINAL_SCENE_NUMBER),
+        () =>
+          expect(mockGameProgressRepository.save).toHaveBeenCalledWith(
+            mockProgress
+          ),
       ]);
     });
   });
@@ -123,7 +178,9 @@ describe('GameService', () => {
         [TEST_CONSTANTS.ROUTE2],
         new Date()
       );
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
 
       const result = await gameService.getCurrentGameState();
 
@@ -141,7 +198,9 @@ describe('GameService', () => {
         TEST_CONSTANTS.VALID_ROUTES,
         new Date()
       );
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
 
       const result = await gameService.getCurrentGameState();
 
@@ -154,17 +213,19 @@ describe('GameService', () => {
       const mockSettings = GameSettings.default();
       const mockProgress = GameProgress.createNew('test-id');
       mockGameSettingsRepository.get = vi.fn().mockResolvedValue(mockSettings);
-      mockGameProgressRepository.getOrCreate = vi.fn().mockResolvedValue(mockProgress);
+      mockGameProgressRepository.getOrCreate = vi
+        .fn()
+        .mockResolvedValue(mockProgress);
       mockGameProgressRepository.save = vi.fn().mockResolvedValue(undefined);
 
       await gameService.performAutoSave();
 
       enhancedAssertions.expectRepositoryMockCalls(mockGameSettingsRepository, [
-        { method: 'get', times: 1 }
+        { method: 'get', times: 1 },
       ]);
       enhancedAssertions.expectRepositoryMockCalls(mockGameProgressRepository, [
         { method: 'getOrCreate', times: 1 },
-        { method: 'save', times: 1 }
+        { method: 'save', times: 1 },
       ]);
     });
 
@@ -175,11 +236,11 @@ describe('GameService', () => {
       await gameService.performAutoSave();
 
       enhancedAssertions.expectRepositoryMockCalls(mockGameSettingsRepository, [
-        { method: 'get', times: 1 }
+        { method: 'get', times: 1 },
       ]);
       enhancedAssertions.expectRepositoryMockCalls(mockGameProgressRepository, [
         { method: 'getOrCreate', times: 0 },
-        { method: 'save', times: 0 }
+        { method: 'save', times: 0 },
       ]);
     });
   });
@@ -194,7 +255,9 @@ describe('GameService', () => {
       await gameService.updateGameSettings(0.5);
 
       expect(mockGameSettingsRepository.get).toHaveBeenCalledOnce();
-      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(updatedSettings);
+      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(
+        updatedSettings
+      );
     });
 
     it('テキスト速度を更新できる', async () => {
@@ -205,7 +268,9 @@ describe('GameService', () => {
 
       await gameService.updateGameSettings(undefined, 2.0);
 
-      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(updatedSettings);
+      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(
+        updatedSettings
+      );
     });
 
     it('オートセーブ設定を更新できる', async () => {
@@ -216,7 +281,9 @@ describe('GameService', () => {
 
       await gameService.updateGameSettings(undefined, undefined, false);
 
-      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(updatedSettings);
+      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(
+        updatedSettings
+      );
     });
 
     it('複数の設定を同時に更新できる', async () => {
@@ -230,7 +297,9 @@ describe('GameService', () => {
 
       await gameService.updateGameSettings(0.3, 1.5, false);
 
-      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(updatedSettings);
+      expect(mockGameSettingsRepository.save).toHaveBeenCalledWith(
+        updatedSettings
+      );
     });
   });
 
