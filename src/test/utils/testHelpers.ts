@@ -10,10 +10,10 @@ export const TEST_CONSTANTS = {
   DEFAULT_TEST_ID: 'test-id',
   SCENES_PER_ROUTE: 100,
   INVALID_ROUTE: 'invalid-route',
-  
+
   // ルート名（直接的で分かりやすい名前）
   ROUTE1: 'route1',
-  ROUTE2: 'route2', 
+  ROUTE2: 'route2',
   ROUTE3: 'route3',
   TRUE_ROUTE: 'trueRoute',
   VALID_ROUTES: ['route1', 'route2', 'route3'],
@@ -24,45 +24,53 @@ export const TEST_CONSTANTS = {
 /**
  * 指定されたルートを選択したGameProgressを作成
  */
-export const createProgressWithRoute = (routeId: string, sceneCount = 0): GameProgress => {
+export const createProgressWithRoute = (
+  routeId: string,
+  sceneCount = 0
+): GameProgress => {
   const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
   progress.selectRoute(RouteId.from(routeId));
-  
+
   for (let i = 0; i < sceneCount; i++) {
     progress.advanceToNextScene();
   }
-  
+
   return progress;
 };
 
 /**
  * 指定されたルートをクリアしたGameProgressを作成
  */
-export const createProgressWithClearedRoutes = (routeNames: string[]): GameProgress => {
+export const createProgressWithClearedRoutes = (
+  routeNames: string[]
+): GameProgress => {
   const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
-  
-  routeNames.forEach(routeName => {
+
+  routeNames.forEach((routeName) => {
     progress.selectRoute(RouteId.from(routeName));
     // 最終シーンまで進める
     for (let i = 0; i < TEST_CONSTANTS.FINAL_SCENE_NUMBER; i++) {
       progress.advanceToNextScene();
     }
   });
-  
+
   return progress;
 };
 
 /**
  * 指定されたシーン数まで進めたGameProgressを作成
  */
-export const createProgressAtScene = (routeId: string, sceneNumber: number): GameProgress => {
+export const createProgressAtScene = (
+  routeId: string,
+  sceneNumber: number
+): GameProgress => {
   const progress = GameProgress.createNew(TEST_CONSTANTS.DEFAULT_TEST_ID);
   progress.selectRoute(RouteId.from(routeId));
-  
+
   for (let i = 0; i < sceneNumber; i++) {
     progress.advanceToNextScene();
   }
-  
+
   return progress;
 };
 
@@ -84,7 +92,7 @@ export const createProgressWithAllBaseRoutesCleared = (): GameProgress => {
  * 複数のルートID配列をRouteIdオブジェクトの配列に変換
  */
 export const createRouteIds = (routeNames: string[]): RouteId[] => {
-  return routeNames.map(name => RouteId.from(name));
+  return routeNames.map((name) => RouteId.from(name));
 };
 
 /**
@@ -97,7 +105,13 @@ export const createRestoredProgress = (
   clearedRoutes: string[],
   lastSaveTime: Date = new Date()
 ): GameProgress => {
-  return GameProgress.restore(id, currentRoute, currentScene, clearedRoutes, lastSaveTime);
+  return GameProgress.restore(
+    id,
+    currentRoute,
+    currentScene,
+    clearedRoutes,
+    lastSaveTime
+  );
 };
 
 // 簡潔な期待値メッセージ（必要に応じて使用）
@@ -116,24 +130,28 @@ export const commonAssertions = {
     expect(routeId.getValue()).toBe(expectedValue);
     expect(routeId.isEmpty()).toBe(false);
   },
-  
+
   expectEmptyRoute: (routeId: RouteId) => {
     expect(routeId.isEmpty()).toBe(true);
     expect(routeId.getValue()).toBe('');
   },
-  
+
   expectSceneNumber: (scene: SceneNumber, expectedValue: number) => {
     expect(scene.getValue()).toBe(expectedValue);
   },
-  
-  expectProgressState: (progress: GameProgress, routeId: string, sceneNumber: number) => {
+
+  expectProgressState: (
+    progress: GameProgress,
+    routeId: string,
+    sceneNumber: number
+  ) => {
     expect(progress.getCurrentRoute().getValue()).toBe(routeId);
     expect(progress.getCurrentScene().getValue()).toBe(sceneNumber);
   },
-  
+
   expectClearedRoutes: (progress: GameProgress, clearedRoutes: string[]) => {
     expect(progress.getClearedRoutes().size).toBe(clearedRoutes.length);
-    clearedRoutes.forEach(routeName => {
+    clearedRoutes.forEach((routeName) => {
       expect(progress.isRouteNameCleared(routeName)).toBe(true);
     });
   },
@@ -179,18 +197,23 @@ export const loopHelpers = {
       progress.advanceToNextScene();
     }
   },
-  
+
   /**
    * 複数のRouteIdを生成する
    */
   createMultipleRouteIds: (count: number, prefix = 'route'): RouteId[] => {
-    return Array.from({ length: count }, (_, i) => RouteId.from(`${prefix}${i + 1}`));
+    return Array.from({ length: count }, (_, i) =>
+      RouteId.from(`${prefix}${i + 1}`)
+    );
   },
-  
+
   /**
    * 配列の各要素に対してテストを実行
    */
-  testForEachRoute: (routes: string[], testFn: (route: string, index: number) => void): void => {
+  testForEachRoute: (
+    routes: string[],
+    testFn: (route: string, index: number) => void
+  ): void => {
     routes.forEach((route, index) => testFn(route, index));
   },
 };
@@ -200,11 +223,13 @@ export const asyncTestHelpers = {
   /**
    * 非同期関数が成功することを期待
    */
-  expectAsyncSuccess: async (fn: () => Promise<{ success: boolean }>): Promise<void> => {
+  expectAsyncSuccess: async (
+    fn: () => Promise<{ success: boolean }>
+  ): Promise<void> => {
     const result = await fn();
     expect(result.success).toBe(true);
   },
-  
+
   /**
    * 非同期関数が失敗することを期待
    */
@@ -218,7 +243,7 @@ export const asyncTestHelpers = {
       expect(result.message).toBe(expectedMessage);
     }
   },
-  
+
   /**
    * 非同期関数がエラーを投げることを期待
    */
@@ -245,7 +270,7 @@ export const enhancedAssertions = {
       expect(result.message).toBe(expectedMessage);
     }
   },
-  
+
   /**
    * リポジトリモックの呼び出し回数を検証
    */
@@ -257,18 +282,18 @@ export const enhancedAssertions = {
       expect(mockRepo[method]).toHaveBeenCalledTimes(times);
     });
   },
-  
+
   /**
    * エラーが投げられることを期待
    */
   expectThrowsError: (fn: () => void, expectedMessage: string): void => {
     expect(fn).toThrow(expectedMessage);
   },
-  
+
   /**
    * 複数のアサーションをまとめて実行
    */
   expectMultiple: (assertions: (() => void)[]): void => {
-    assertions.forEach(assertion => assertion());
+    assertions.forEach((assertion) => assertion());
   },
 };

@@ -26,7 +26,7 @@ export class DexieTextLogRepository implements TextLogRepository {
   constructor() {
     this.db = new Dexie('QualityPrismTextLogs');
     this.db.version(1).stores({
-      textLogs: 'id, routeId, sceneNumber, timestamp'
+      textLogs: 'id, routeId, sceneNumber, timestamp',
     });
     this.textLogs = this.db.table('textLogs');
   }
@@ -41,7 +41,7 @@ export class DexieTextLogRepository implements TextLogRepository {
       sceneNumber: entry.getScene().getValue(),
       speakerName: 'システム', // TextLogEntryにはspeakerNameがないのでデフォルト値
       textContent: entry.getText(),
-      timestamp: entry.getTimestamp()
+      timestamp: entry.getTimestamp(),
     };
 
     await this.textLogs.put(data);
@@ -72,7 +72,7 @@ export class DexieTextLogRepository implements TextLogRepository {
     const entries = await this.textLogs
       .where('routeId')
       .equals(routeId.getValue())
-      .and(entry => entry.sceneNumber === sceneNumber.getValue())
+      .and((entry) => entry.sceneNumber === sceneNumber.getValue())
       .toArray();
 
     // タイムスタンプでソート
@@ -97,10 +97,7 @@ export class DexieTextLogRepository implements TextLogRepository {
    * 指定されたルートのテキストログを削除
    */
   async deleteByRoute(routeId: RouteId): Promise<void> {
-    await this.textLogs
-      .where('routeId')
-      .equals(routeId.getValue())
-      .delete();
+    await this.textLogs.where('routeId').equals(routeId.getValue()).delete();
   }
 
   /**

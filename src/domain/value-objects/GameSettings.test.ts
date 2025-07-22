@@ -151,7 +151,7 @@ describe('GameSettings', () => {
       expect(updated.getVolume()).toBe(0.5);
       expect(updated.getTextSpeed()).toBe(2.0);
       expect(updated.isAutoSaveEnabled()).toBe(false);
-      
+
       // 元のオブジェクトは変更されていない
       expect(original.getVolume()).toBe(0.8);
       expect(original.getTextSpeed()).toBe(1.0);

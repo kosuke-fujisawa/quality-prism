@@ -85,8 +85,12 @@ export class GameProgress {
    * 全ベースルート（route1, route2, route3）がクリアされている必要がある
    */
   isTrueRouteUnlocked(): boolean {
-    const clearedRouteNames = Array.from(this.clearedRoutes).map((route) => route.getValue());
-    return ['route1', 'route2', 'route3'].every(route => clearedRouteNames.includes(route));
+    const clearedRouteNames = Array.from(this.clearedRoutes).map((route) =>
+      route.getValue()
+    );
+    return ['route1', 'route2', 'route3'].every((route) =>
+      clearedRouteNames.includes(route)
+    );
   }
 
   /**
@@ -102,15 +106,17 @@ export class GameProgress {
    * 指定したルート名がクリア済みかチェック
    */
   isRouteNameCleared(routeName: string): boolean {
-    return Array.from(this.clearedRoutes).some((cleared) =>
-      cleared.getValue() === routeName
+    return Array.from(this.clearedRoutes).some(
+      (cleared) => cleared.getValue() === routeName
     );
   }
 
   private markRouteAsCleared(routeId: RouteId): void {
     // 同じ値のRouteIdがすでにSetに存在しても、新しいインスタンスを追加
     // Setは参照ベースなので、新しいインスタンスは追加される
-    const existingRoute = Array.from(this.clearedRoutes).find(route => route.equals(routeId));
+    const existingRoute = Array.from(this.clearedRoutes).find((route) =>
+      route.equals(routeId)
+    );
     if (!existingRoute) {
       this.clearedRoutes.add(routeId);
     }
@@ -145,7 +151,7 @@ export class GameProgress {
   ): GameProgress {
     // 無効なシーン番号は0に正規化
     const normalizedScene = Math.max(0, Math.min(currentScene, 100));
-    
+
     // 重複除去のため、一度文字列のSetにしてからRouteIdのSetに変換
     const uniqueRouteNames = Array.from(new Set(clearedRoutes));
     const clearedRouteSet = new Set(

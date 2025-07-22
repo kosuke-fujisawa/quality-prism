@@ -4,11 +4,7 @@ import {
   JsonLogFormatter,
   HumanReadableLogFormatter,
 } from './ConsoleAppender';
-import {
-  LogLevel,
-  LogLayer,
-  LogEntry,
-} from '../../domain/interfaces/ILogger';
+import { LogLevel, LogLayer, LogEntry } from '../../domain/interfaces/ILogger';
 
 describe('ConsoleAppender', () => {
   let consoleDebugSpy: any;
@@ -220,7 +216,9 @@ describe('HumanReadableLogFormatter', () => {
 
     const result = formatter.format(entry);
 
-    expect(result).toContain('2024-01-01T12:00:00.000Z WARN  warning message [');
+    expect(result).toContain(
+      '2024-01-01T12:00:00.000Z WARN  warning message ['
+    );
     expect(result).toContain('layer=domain');
     expect(result).toContain('op=test-operation');
     expect(result).toContain('user=user-123');

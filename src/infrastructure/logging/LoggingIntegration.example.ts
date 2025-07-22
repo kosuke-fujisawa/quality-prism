@@ -18,15 +18,15 @@ export class GameProgressWithLogging {
 
   selectRoute(routeId: string): void {
     const startTime = Date.now();
-    
+
     try {
       // ゲームアクションをログ
       this.logger.logGameAction('route-selection', {
         userId: 'user-123',
         routeId,
         metadata: {
-          availableRoutes: ['route1', 'route2', 'trueRoute']
-        }
+          availableRoutes: ['route1', 'route2', 'trueRoute'],
+        },
       });
 
       // ビジネスロジック実行
@@ -36,18 +36,17 @@ export class GameProgressWithLogging {
       this.logger.logStateChange('menu', 'game', {
         userId: 'user-123',
         routeId,
-        gameState: 'playing'
+        gameState: 'playing',
       });
 
       // パフォーマンス測定
       const duration = Date.now() - startTime;
       this.logger.logPerformance('route-selection', duration);
-
     } catch (error) {
       this.logger.error('Route selection failed', error as Error, {
         userId: 'user-123',
         routeId,
-        operation: 'route-selection'
+        operation: 'route-selection',
       });
       throw error;
     }
@@ -62,8 +61,8 @@ export class GameProgressWithLogging {
       userId: 'user-123',
       metadata: {
         completionTime: new Date().toISOString(),
-        score: 100
-      }
+        score: 100,
+      },
     });
   }
 }
@@ -85,25 +84,24 @@ export class GameServiceWithLogging {
       operation: 'start-game',
       metadata: {
         sessionId: this.generateSessionId(),
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     });
 
     try {
       // アプリケーションロジック
       await this.initializeGame(userId, routeId);
-      
+
       this.logger.logGameAction('game-start', {
         userId,
         routeId,
-        gameState: 'initialized'
+        gameState: 'initialized',
       });
-
     } catch (error) {
       this.logger.error('Game initialization failed', error as Error, {
         userId,
         routeId,
-        operation: 'start-game'
+        operation: 'start-game',
       });
       throw error;
     }
@@ -114,22 +112,21 @@ export class GameServiceWithLogging {
 
     try {
       await this.persistGameData(userId, gameData);
-      
+
       const duration = Date.now() - startTime;
       this.logger.logSaveLoad('save', true, {
         userId,
         metadata: {
           dataSize: JSON.stringify(gameData).length,
-          duration
-        }
+          duration,
+        },
       });
-
     } catch (error) {
       this.logger.logSaveLoad('save', false, {
         userId,
         metadata: {
-          errorMessage: (error as Error).message
-        }
+          errorMessage: (error as Error).message,
+        },
       });
       throw error;
     }
@@ -170,20 +167,26 @@ export class GameProgressRepositoryWithLogging {
       this.logger.logConnection(repositoryName, 'connected');
 
       // 実際のクエリ実行
-      const result = await this.executeQuery('SELECT * FROM game_progress WHERE id = ?', [id]);
-      
+      const result = await this.executeQuery(
+        'SELECT * FROM game_progress WHERE id = ?',
+        [id]
+      );
+
       // 結果をログ
-      this.logger.logQueryResult(repositoryName, 'findById', Array.isArray(result) ? result.length : 1);
+      this.logger.logQueryResult(
+        repositoryName,
+        'findById',
+        Array.isArray(result) ? result.length : 1
+      );
 
       // パフォーマンス指標をログ
       const duration = Date.now() - startTime;
       this.logger.logPerformanceMetrics(repositoryName, 'findById', {
         duration,
-        recordCount: Array.isArray(result) ? result.length : 1
+        recordCount: Array.isArray(result) ? result.length : 1,
       });
 
       return result;
-
     } catch (error) {
       // エラーをログ
       this.logger.logQueryError(repositoryName, 'findById', error as Error);
@@ -193,27 +196,28 @@ export class GameProgressRepositoryWithLogging {
 
   async save(entity: any): Promise<void> {
     const repositoryName = 'GameProgressRepository';
-    
+
     // 機密情報を含む可能性があるパラメータも安全にログ
     this.logger.logQuery(repositoryName, 'save', {
       id: entity.id,
       userId: entity.userId,
       password: 'secret123', // これは自動的にマスクされる
-      gameData: entity.gameData
+      gameData: entity.gameData,
     });
 
     try {
-      await this.executeUpdate('UPDATE game_progress SET data = ? WHERE id = ?', 
-        [JSON.stringify(entity.gameData), entity.id]);
-      
+      await this.executeUpdate(
+        'UPDATE game_progress SET data = ? WHERE id = ?',
+        [JSON.stringify(entity.gameData), entity.id]
+      );
+
       this.logger.info('Game progress saved successfully', {
         operation: 'repository-save',
         metadata: {
           entityId: entity.id,
-          repository: repositoryName
-        }
+          repository: repositoryName,
+        },
       });
-
     } catch (error) {
       this.logger.logQueryError(repositoryName, 'save', error as Error);
       throw error;
@@ -265,13 +269,13 @@ export class LoggingConfiguration {
     // IndexedDBアペンダーからログを検索
     // 注意: 実際の実装では、ファクトリーからアペンダーにアクセスする
     // 適切な方法を提供する必要があります
-    
+
     const logger = loggerFactory.createLogger();
     logger.info('Log export initiated', {
       operation: 'log-export',
       metadata: {
-        exportTime: new Date().toISOString()
-      }
+        exportTime: new Date().toISOString(),
+      },
     });
   }
 }
@@ -295,19 +299,23 @@ export class ErrorMonitoring {
           filename: event.filename,
           lineno: event.lineno,
           colno: event.colno,
-          message: event.message
-        }
+          message: event.message,
+        },
       });
     });
 
     // Promise拒否ハンドラー
     window.addEventListener('unhandledrejection', (event) => {
-      this.logger.error('Unhandled promise rejection', new Error(event.reason), {
-        operation: 'promise-rejection-handler',
-        metadata: {
-          reason: event.reason
+      this.logger.error(
+        'Unhandled promise rejection',
+        new Error(event.reason),
+        {
+          operation: 'promise-rejection-handler',
+          metadata: {
+            reason: event.reason,
+          },
         }
-      });
+      );
     });
   }
 
@@ -317,15 +325,22 @@ export class ErrorMonitoring {
   monitorPerformance(): void {
     // ページロード時間の監視
     window.addEventListener('load', () => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
+
       if (navigation) {
-        this.logger.logPerformance('page-load', navigation.loadEventEnd - navigation.fetchStart, {
-          metadata: {
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.fetchStart,
-            firstPaint: navigation.responseEnd - navigation.fetchStart
+        this.logger.logPerformance(
+          'page-load',
+          navigation.loadEventEnd - navigation.fetchStart,
+          {
+            metadata: {
+              domContentLoaded:
+                navigation.domContentLoadedEventEnd - navigation.fetchStart,
+              firstPaint: navigation.responseEnd - navigation.fetchStart,
+            },
           }
-        });
+        );
       }
     });
   }
@@ -354,7 +369,7 @@ export function initializeLoggingSystem(): void {
     metadata: {
       version: '1.0.0',
       timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent
-    }
+      userAgent: navigator.userAgent,
+    },
   });
 }

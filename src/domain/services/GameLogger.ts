@@ -120,9 +120,13 @@ export class GameLogger extends BaseLogger implements IGameLogger {
   /**
    * セーブ・ロード操作のログ
    */
-  logSaveLoad(operation: 'save' | 'load', success: boolean, context?: GameLogContext): void {
+  logSaveLoad(
+    operation: 'save' | 'load',
+    success: boolean,
+    context?: GameLogContext
+  ): void {
     const message = `${operation} operation ${success ? 'successful' : 'failed'}`;
-    
+
     if (success) {
       this.info(message, {
         ...context,

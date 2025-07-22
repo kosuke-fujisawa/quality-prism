@@ -21,18 +21,17 @@ import { IndexedDBAppender } from './IndexedDBAppender';
 export class LoggerFactory {
   private static instance: LoggerFactory;
   private logLevel: LogLevel = LogLevel.INFO;
-  private isDevelopment: boolean = false;
-  private enablePersistentLogging: boolean = false;
+  private isDevelopment = false;
+  private enablePersistentLogging = false;
 
   private constructor() {
     // 環境判定
-    this.isDevelopment = 
-      typeof process !== 'undefined' && 
-      process.env.NODE_ENV === 'development';
-    
+    this.isDevelopment =
+      typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+
     // 開発環境ではDEBUGレベル、本番環境ではINFOレベル
     this.logLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.INFO;
-    
+
     // 本番環境では永続化ログを有効化
     this.enablePersistentLogging = !this.isDevelopment;
   }

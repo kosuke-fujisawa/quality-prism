@@ -25,9 +25,9 @@ describe('TextLogEntry', () => {
       const scene = SceneNumber.from(5);
       const timestamp = new Date();
 
-      expect(() => new TextLogEntry('test-id', route, scene, '', timestamp)).toThrow(
-        'テキストは空にできません'
-      );
+      expect(
+        () => new TextLogEntry('test-id', route, scene, '', timestamp)
+      ).toThrow('テキストは空にできません');
     });
 
     it('空白のみのテキストでは作成できない', () => {
@@ -35,9 +35,9 @@ describe('TextLogEntry', () => {
       const scene = SceneNumber.from(5);
       const timestamp = new Date();
 
-      expect(() => new TextLogEntry('test-id', route, scene, '   ', timestamp)).toThrow(
-        'テキストは空にできません'
-      );
+      expect(
+        () => new TextLogEntry('test-id', route, scene, '   ', timestamp)
+      ).toThrow('テキストは空にできません');
     });
   });
 
@@ -45,7 +45,13 @@ describe('TextLogEntry', () => {
     it('同じルートの場合はtrueを返す', () => {
       const route = RouteId.from('route1');
       const scene = SceneNumber.from(5);
-      const entry = new TextLogEntry('test-id', route, scene, 'テスト', new Date());
+      const entry = new TextLogEntry(
+        'test-id',
+        route,
+        scene,
+        'テスト',
+        new Date()
+      );
 
       expect(entry.isFromRoute(RouteId.from('route1'))).toBe(true);
     });
@@ -53,7 +59,13 @@ describe('TextLogEntry', () => {
     it('異なるルートの場合はfalseを返す', () => {
       const route = RouteId.from('route1');
       const scene = SceneNumber.from(5);
-      const entry = new TextLogEntry('test-id', route, scene, 'テスト', new Date());
+      const entry = new TextLogEntry(
+        'test-id',
+        route,
+        scene,
+        'テスト',
+        new Date()
+      );
 
       expect(entry.isFromRoute(RouteId.from('route2'))).toBe(false);
     });
@@ -63,7 +75,13 @@ describe('TextLogEntry', () => {
     it('同じシーンの場合はtrueを返す', () => {
       const route = RouteId.from('route1');
       const scene = SceneNumber.from(5);
-      const entry = new TextLogEntry('test-id', route, scene, 'テスト', new Date());
+      const entry = new TextLogEntry(
+        'test-id',
+        route,
+        scene,
+        'テスト',
+        new Date()
+      );
 
       expect(entry.isFromScene(SceneNumber.from(5))).toBe(true);
     });
@@ -71,7 +89,13 @@ describe('TextLogEntry', () => {
     it('異なるシーンの場合はfalseを返す', () => {
       const route = RouteId.from('route1');
       const scene = SceneNumber.from(5);
-      const entry = new TextLogEntry('test-id', route, scene, 'テスト', new Date());
+      const entry = new TextLogEntry(
+        'test-id',
+        route,
+        scene,
+        'テスト',
+        new Date()
+      );
 
       expect(entry.isFromScene(SceneNumber.from(6))).toBe(false);
     });
@@ -113,8 +137,12 @@ describe('TextLogEntry', () => {
       const entry = TextLogEntry.create(route, scene, text);
       const afterCreate = new Date();
 
-      expect(entry.getTimestamp().getTime()).toBeGreaterThanOrEqual(beforeCreate.getTime());
-      expect(entry.getTimestamp().getTime()).toBeLessThanOrEqual(afterCreate.getTime());
+      expect(entry.getTimestamp().getTime()).toBeGreaterThanOrEqual(
+        beforeCreate.getTime()
+      );
+      expect(entry.getTimestamp().getTime()).toBeLessThanOrEqual(
+        afterCreate.getTime()
+      );
     });
   });
 
@@ -141,9 +169,9 @@ describe('TextLogEntry', () => {
       const scene = 5;
       const timestamp = new Date('2023-01-01T10:00:00Z');
 
-      expect(() => TextLogEntry.restore(id, route, scene, '', timestamp)).toThrow(
-        'テキストは空にできません'
-      );
+      expect(() =>
+        TextLogEntry.restore(id, route, scene, '', timestamp)
+      ).toThrow('テキストは空にできません');
     });
   });
 
@@ -152,7 +180,13 @@ describe('TextLogEntry', () => {
       const route = RouteId.from('route1');
       const scene = SceneNumber.from(5);
       const originalTimestamp = new Date('2023-01-01T10:00:00Z');
-      const entry = new TextLogEntry('test-id', route, scene, 'テスト', originalTimestamp);
+      const entry = new TextLogEntry(
+        'test-id',
+        route,
+        scene,
+        'テスト',
+        originalTimestamp
+      );
 
       const retrievedTimestamp = entry.getTimestamp();
       retrievedTimestamp.setTime(0); // 取得したタイムスタンプを変更

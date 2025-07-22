@@ -24,7 +24,11 @@ export class RepositoryLogger extends BaseLogger implements IRepositoryLogger {
     this.debug(`Repository query: ${repository}.${operation}`, context);
   }
 
-  logQueryResult(repository: string, operation: string, resultCount: number): void {
+  logQueryResult(
+    repository: string,
+    operation: string,
+    resultCount: number
+  ): void {
     const context: LogContext = {
       layer: LogLayer.INFRASTRUCTURE,
       operation: 'repository-result',
@@ -63,7 +67,10 @@ export class RepositoryLogger extends BaseLogger implements IRepositoryLogger {
   /**
    * データベース接続状態のログ
    */
-  logConnection(repository: string, status: 'connected' | 'disconnected' | 'error'): void {
+  logConnection(
+    repository: string,
+    status: 'connected' | 'disconnected' | 'error'
+  ): void {
     const context: LogContext = {
       layer: LogLayer.INFRASTRUCTURE,
       operation: 'repository-connection',
@@ -81,7 +88,11 @@ export class RepositoryLogger extends BaseLogger implements IRepositoryLogger {
         this.info(`Repository disconnected: ${repository}`, context);
         break;
       case 'error':
-        this.error(`Repository connection error: ${repository}`, undefined, context);
+        this.error(
+          `Repository connection error: ${repository}`,
+          undefined,
+          context
+        );
         break;
     }
   }
@@ -156,7 +167,7 @@ export class RepositoryLogger extends BaseLogger implements IRepositoryLogger {
 
     // 配列の場合
     if (Array.isArray(params)) {
-      return params.map(param => this.sanitizeParams(param));
+      return params.map((param) => this.sanitizeParams(param));
     }
 
     // オブジェクトの場合
@@ -187,8 +198,8 @@ export class RepositoryLogger extends BaseLogger implements IRepositoryLogger {
       'privatekey',
       'credential',
     ];
-    
-    return sensitiveKeys.some(sensitiveKey =>
+
+    return sensitiveKeys.some((sensitiveKey) =>
       key.toLowerCase().includes(sensitiveKey)
     );
   }

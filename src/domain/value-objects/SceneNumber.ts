@@ -9,17 +9,17 @@ export class SceneNumber {
     if (isNaN(value)) {
       throw new Error('シーン番号は有効な数値でなければなりません');
     }
-    
+
     // Infinity値の検証
     if (!isFinite(value)) {
       throw new Error('シーン番号は有限の数値でなければなりません');
     }
-    
+
     // 整数値の検証
     if (!Number.isInteger(value)) {
       throw new Error('シーン番号は整数でなければなりません');
     }
-    
+
     // 範囲値の検証
     if (value < 0) {
       throw new Error('シーン番号は0以上でなければなりません');

@@ -16,9 +16,15 @@ describe('RouteId エッジケース', () => {
     });
 
     it('特殊記号を含むルートIDを処理できる', () => {
-      const specialCases = ['route-1', 'route.1', 'route_1', 'route@1', 'route#1'];
-      
-      specialCases.forEach(specialRoute => {
+      const specialCases = [
+        'route-1',
+        'route.1',
+        'route_1',
+        'route@1',
+        'route#1',
+      ];
+
+      specialCases.forEach((specialRoute) => {
         const routeId = RouteId.from(specialRoute);
         expect(routeId.getValue()).toBe(specialRoute);
         expect(routeId.isEmpty()).toBe(false);
@@ -28,7 +34,7 @@ describe('RouteId エッジケース', () => {
     it('Unicode制御文字を含むルートIDを処理できる', () => {
       const routeWithTab = RouteId.from('route\t1');
       const routeWithNewline = RouteId.from('route\n1');
-      
+
       expect(routeWithTab.getValue()).toBe('route\t1');
       expect(routeWithNewline.getValue()).toBe('route\n1');
     });
@@ -36,10 +42,10 @@ describe('RouteId エッジケース', () => {
     it('空白文字の組み合わせを正しく処理する', () => {
       const routeId1 = RouteId.from(' route1 ');
       const routeId2 = RouteId.from('\t\n\r');
-      
+
       expect(routeId1.getValue()).toBe(' route1 ');
       expect(routeId1.isEmpty()).toBe(false);
-      
+
       expect(routeId2.getValue()).toBe('\t\n\r');
       expect(routeId2.isEmpty()).toBe(true); // 空白文字のみなのでtrue
     });
@@ -49,7 +55,7 @@ describe('RouteId エッジケース', () => {
     it('非常に長いルートIDを処理できる', () => {
       const longRoute = 'a'.repeat(1000);
       const routeId = RouteId.from(longRoute);
-      
+
       expect(routeId.getValue()).toBe(longRoute);
       expect(routeId.getValue().length).toBe(1000);
       expect(routeId.isEmpty()).toBe(false);
@@ -60,7 +66,7 @@ describe('RouteId エッジケース', () => {
       const routeId1 = RouteId.from(longRoute);
       const routeId2 = RouteId.from(longRoute);
       const routeId3 = RouteId.from(longRoute + '1');
-      
+
       expect(routeId1.equals(routeId2)).toBe(true);
       expect(routeId1.equals(routeId3)).toBe(false);
     });
@@ -96,14 +102,14 @@ describe('RouteId エッジケース', () => {
     it('大文字小文字の違いを正しく判定する', () => {
       const routeId1 = RouteId.from('Route1');
       const routeId2 = RouteId.from('route1');
-      
+
       expect(routeId1.equals(routeId2)).toBe(false);
     });
 
     it('前後の空白の違いを正しく判定する', () => {
       const routeId1 = RouteId.from('route1');
       const routeId2 = RouteId.from(' route1 ');
-      
+
       expect(routeId1.equals(routeId2)).toBe(false);
     });
 
@@ -134,7 +140,7 @@ describe('RouteId エッジケース', () => {
     it('複数の特殊文字を組み合わせた場合', () => {
       const complexRoute = 'route-1_test.2@domain#section';
       const routeId = RouteId.from(complexRoute);
-      
+
       expect(routeId.getValue()).toBe(complexRoute);
       expect(routeId.toString()).toBe(complexRoute);
       expect(routeId.isEmpty()).toBe(false);
@@ -143,7 +149,7 @@ describe('RouteId エッジケース', () => {
     it('Unicodeと特殊文字の混在', () => {
       const mixedRoute = 'ルート-1_テスト.2🎮';
       const routeId = RouteId.from(mixedRoute);
-      
+
       expect(routeId.getValue()).toBe(mixedRoute);
       expect(routeId.isEmpty()).toBe(false);
     });
@@ -157,12 +163,12 @@ describe('RouteId エッジケース', () => {
   describe('メモリとパフォーマンス', () => {
     it('大量のRouteIdオブジェクト作成でのメモリ使用量', () => {
       const routes: RouteId[] = [];
-      
+
       // 1000個のRouteIdを作成
       for (let i = 0; i < 1000; i++) {
         routes.push(RouteId.from(`route${i}`));
       }
-      
+
       expect(routes.length).toBe(1000);
       expect(routes[0].getValue()).toBe('route0');
       expect(routes[999].getValue()).toBe('route999');
@@ -173,18 +179,18 @@ describe('RouteId エッジケース', () => {
       const routeId1 = RouteId.from(baseRoute);
       const routeId2 = RouteId.from(baseRoute);
       const routeId3 = RouteId.from(baseRoute + 'diff');
-      
+
       // パフォーマンステストとして実行時間を測定
       const start = performance.now();
-      
+
       for (let i = 0; i < 100; i++) {
         routeId1.equals(routeId2);
         routeId1.equals(routeId3);
       }
-      
+
       const end = performance.now();
       const duration = end - start;
-      
+
       // 100回の等価性チェックが100ms以内で完了することを確認
       expect(duration).toBeLessThan(100);
       expect(routeId1.equals(routeId2)).toBe(true);

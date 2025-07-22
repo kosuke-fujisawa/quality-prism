@@ -6,7 +6,6 @@ import { RouteConfiguration } from '../value-objects/RouteConfiguration';
  * ルート選択の妥当性を検証するドメインサービス
  */
 export class RouteValidationService {
-
   /**
    * ルートが選択可能かどうかを検証
    */
