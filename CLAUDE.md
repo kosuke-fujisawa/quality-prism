@@ -548,14 +548,139 @@ export class GameService {
 4. **型安全性**: TypeScript strict modeを活用しているか
 5. **不変性**: 値オブジェクトの不変性が保証されているか
 
+## 🚦 CodeRabbitレビュー必須ワークフロー
+
+### 基本原則
+**本番（main）への反映前に、必ずCodeRabbitのレビューをパスすること**
+
+### 開発フロー手順
+
+#### 1. 機能開発フェーズ
+```bash
+# 機能ブランチ作成
+git checkout -b feature/新機能名
+
+# TDD実践
+# - テストを先に書く
+# - 実装する
+# - リファクタリングする
+
+# コミット
+git add .
+git commit -m "feat: 新機能実装"
+git push origin feature/新機能名
+```
+
+#### 2. CodeRabbitレビューフェーズ
+```bash
+# PR作成
+gh pr create --title "feat: 新機能実装" --body "詳細説明"
+
+# CodeRabbitが自動レビューを開始（数分待機）
+# ⏳ レビュー完了まで待機...
+```
+
+#### 3. レビュー対応フェーズ
+
+**CodeRabbitから指摘がある場合:**
+```bash
+# 指摘事項を確認・修正
+# - セキュリティ問題
+# - パフォーマンス改善
+# - コードスタイル
+# - アーキテクチャ設計
+
+# 修正をコミット
+git add .
+git commit -m "fix: CodeRabbit指摘事項対応"
+git push origin feature/新機能名
+
+# 再レビューを依頼
+# PRにコメント: "@coderabbitai review"
+```
+
+**CodeRabbitからOKが出た場合:**
+```bash
+# mainブランチにマージ
+gh pr merge --squash  # または --merge, --rebase
+
+# ローカルブランチクリーンアップ
+git checkout main
+git pull origin main
+git branch -d feature/新機能名
+```
+
+#### 4. 緊急修正の場合
+```bash
+# hotfixブランチ作成
+git checkout -b hotfix/緊急修正
+
+# 修正実装
+git add .
+git commit -m "hotfix: 緊急修正"
+git push origin hotfix/緊急修正
+
+# PR作成 & CodeRabbitレビュー
+gh pr create --title "hotfix: 緊急修正" --body "緊急度: 高"
+
+# レビュー完了後、即座にマージ
+gh pr merge --squash
+```
+
+### CodeRabbitレビュー承認基準
+
+#### ✅ マージ可能な状態
+- CodeRabbitから重要な指摘事項なし
+- 全テストが成功（425テスト100%）
+- TypeScript型チェック成功
+- ESLint・Prettier準拠
+- セキュリティ監査クリア
+
+#### ❌ マージ不可の状態
+- CodeRabbitから重要な指摘事項あり
+- テスト失敗
+- 型エラーあり
+- セキュリティ脆弱性検出
+
+### CodeRabbitとの効果的な対話方法
+
+#### レビューコメントへの返信
+```
+# 修正完了後
+"@coderabbitai 修正しました。再レビューをお願いします。"
+
+# 複雑なロジックの説明依頼
+"@coderabbitai この複雑な処理について説明してください。"
+
+# 改善提案の依頼
+"@coderabbitai この関数をもっとモジュラーにする方法を提案してください。"
+```
+
+#### プロジェクト固有の質問例
+```
+"@coderabbitai この実装はDDD原則に従っていますか？"
+"@coderabbitai エッジケーステストが不足している箇所はありますか？"
+"@coderabbitai TypeScript型定義をより厳密にする方法を教えてください。"
+```
+
+### 重要なルール
+
+1. **絶対にCodeRabbitレビューをスキップしない**
+2. **指摘事項は必ず対応する（または理由を説明）**
+3. **緊急時でも最低限のレビューは受ける**
+4. **CodeRabbitが理解できるよう明確なコミットメッセージを書く**
+5. **複雑な変更は小さなPRに分割する**
+
 ## 🔄 継続的改善プロセス
 
 ### 日常的な開発サイクル
 1. **朝の品質チェック**: `npm test` で全テスト状況を確認
 2. **機能開発**: TDD + DDDアプローチで実装
-3. **コミット前**: 品質チェックリストを確認
-4. **週次レビュー**: テストカバレッジと失敗テストの分析
-5. **CodeRabbitレビュー**: AIによる継続的なコード品質向上
+3. **PR作成**: 機能ブランチからPR作成
+4. **CodeRabbitレビュー待機**: AIレビュー完了まで待機
+5. **レビュー対応**: 指摘事項の修正・再レビュー依頼
+6. **本番反映**: CodeRabbit承認後のmainマージ
+7. **週次レビュー**: テストカバレッジ・CodeRabbit指摘傾向の分析
 
 ### 品質向上のための継続的取り組み
 - **テスト品質の向上**: 全425テストが成功し、100%の成功率を達成
