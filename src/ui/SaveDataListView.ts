@@ -1,4 +1,5 @@
-import { SaveDataListService, SaveDataSummary } from '../application/services/SaveDataListService';
+import type { SaveDataSummary } from '../application/services/SaveDataListService';
+import { SaveDataListService } from '../application/services/SaveDataListService';
 
 /**
  * セーブデータ一覧表示UI
@@ -7,12 +8,19 @@ import { SaveDataListService, SaveDataSummary } from '../application/services/Sa
 export class SaveDataListView {
   private saveDataList: SaveDataSummary[] = [];
   private htmlContent = '';
+  private saveDataListService: SaveDataListService;
+  private onSelectCallback: (id: string) => void;
+  private onCancelCallback: () => void;
 
   constructor(
-    private saveDataListService: SaveDataListService,
-    private onSelectCallback: (id: string) => void,
-    private onCancelCallback: () => void
-  ) {}
+    saveDataListService: SaveDataListService,
+    onSelectCallback: (id: string) => void,
+    onCancelCallback: () => void
+  ) {
+    this.saveDataListService = saveDataListService;
+    this.onSelectCallback = onSelectCallback;
+    this.onCancelCallback = onCancelCallback;
+  }
 
   /**
    * セーブデータ一覧を表示

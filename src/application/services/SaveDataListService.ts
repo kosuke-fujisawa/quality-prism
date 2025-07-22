@@ -1,4 +1,4 @@
-import { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
+import type { GameProgressRepository } from '../../domain/repositories/GameProgressRepository';
 import { GameProgress } from '../../domain/entities/GameProgress';
 
 /**
@@ -6,7 +6,11 @@ import { GameProgress } from '../../domain/entities/GameProgress';
  * セーブデータの一覧表示・選択・読み込み機能を提供
  */
 export class SaveDataListService {
-  constructor(private gameProgressRepository: GameProgressRepository) {}
+  private gameProgressRepository: GameProgressRepository;
+  
+  constructor(gameProgressRepository: GameProgressRepository) {
+    this.gameProgressRepository = gameProgressRepository;
+  }
 
   /**
    * セーブデータ一覧を取得
@@ -17,9 +21,9 @@ export class SaveDataListService {
     message?: string;
   }> {
     try {
-      const allSaveData = await this.gameProgressRepository.getAll();
+      const allSaveData = await (this.gameProgressRepository as any).getAll();
       
-      const saveDataList = allSaveData.map(data => ({
+      const saveDataList = allSaveData.map((data: any) => ({
         id: data.getId(),
         routeName: data.getCurrentRoute().getValue(),
         sceneNumber: data.getCurrentScene().getValue(),
@@ -47,8 +51,8 @@ export class SaveDataListService {
     message?: string;
   }> {
     try {
-      const allSaveData = await this.gameProgressRepository.getAll();
-      const targetSaveData = allSaveData.find(data => data.getId() === id);
+      const allSaveData = await (this.gameProgressRepository as any).getAll();
+      const targetSaveData = allSaveData.find((data: any) => data.getId() === id);
 
       if (!targetSaveData) {
         return {
