@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit configuration file
 # For comprehensive language support and enhanced reviews
 
@@ -26,13 +27,18 @@ reviews:
 
 # Language and framework-specific settings
 knowledge_base:
-  - TypeScript
-  - Node.js
-  - Vite
-  - Vitest
-  - Playwright
-  - DDD (Domain-Driven Design)
-  - TDD (Test-Driven Development)
+  languages:
+    - TypeScript
+    - JavaScript
+  frameworks:
+    - Node.js
+    - Vite
+  testing:
+    - Vitest
+    - Playwright
+  architecture:
+    - "DDD (Domain-Driven Design)"
+    - "TDD (Test-Driven Development)"
 
 # Pathways to focus on
 path_filters:
