@@ -41,7 +41,7 @@ export class SaveDataListView {
     } catch (error) {
       return {
         success: false,
-        message: 'セーブデータの表示に失敗しました',
+        message: 'セーブデータの読み込みに失敗しました',
       };
     }
   }

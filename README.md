@@ -1,6 +1,7 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-425%20total%20|%20425%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-445%20total%20|%20445%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-AI%20Code%20Review-blue)](https://coderabbit.ai)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
 
@@ -16,7 +17,8 @@
 - 💾 **永続化**: IndexedDBによるセーブデータ管理
 - 📝 **YAML駆動**: シナリオファイルによる柔軟なコンテンツ管理
 - 🔀 **マルチルート**: 選択肢に基づく分岐ストーリー
-- 🧪 **高品質**: 425テスト・100%成功率
+- 🧪 **高品質**: 445テスト・100%成功率
+- 🤖 **CodeRabbit**: AI駆動コードレビュー自動化
 - 📊 **ロギング**: エンタープライズレベルの監視・デバッグ機能
 
 ## 🚀 クイックスタート
@@ -187,9 +189,9 @@ npm audit --audit-level high
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 425
-- **成功率**: 100% (425/425)
-- **単体テスト**: 411テスト (30ファイル)
+- **総テスト数**: 445
+- **成功率**: 100% (445/445)
+- **単体テスト**: 431テスト (33ファイル) - **全テスト成功** 
 - **E2Eテスト**: 14テスト (2ファイル)
 - **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
@@ -219,9 +221,13 @@ npm audit --audit-level high
 - `ILogger.test.ts` (11 tests): ロガーインターフェース・型定義
 - `GameLogger.test.ts` (11 tests): ゲーム専用ロガー
 
-#### DDDアーキテクチャ - アプリケーション層 (31 tests)
+#### DDDアーキテクチャ - アプリケーション層 (73 tests)
 - `GameService.test.ts` (16 tests): ゲームアプリケーションサービス
 - `GameService.edge-cases.test.ts` (15 tests): 非同期エラー・競合状態・タイムアウト
+- `SaveDataListService.test.ts` (7 tests): セーブデータ一覧管理サービス
+- **UI層** (35 tests):
+  - `SaveDataListView.test.ts` (8 tests): セーブデータ一覧表示UI
+  - `NovelGameApp.load-integration.test.ts` (7 tests): ロード機能統合テスト
 
 #### DDDアーキテクチャ - インフラストラクチャ層 (108 tests)
 - `DexieGameProgressRepository.test.ts` (12 tests): ゲーム進行リポジトリ
@@ -387,7 +393,9 @@ texts:
 - [x] YAMLシナリオローダー
 - [x] セーブデータシステム
 - [x] **DDDアーキテクチャ実装**
-- [x] **包括的テストスイート (328 tests)**
+- [x] **包括的テストスイート (445 tests)**
+- [x] **CodeRabbit AI レビュー**: 必須レビューワークフロー
+- [x] **Issue #6解決**: ロードボタンからセーブデータ一覧表示機能
 - [x] **TDD準拠開発プロセス**
 - [x] **エッジケース・エラーハンドリング**
 - [x] **データ永続化・復元システム**
@@ -410,6 +418,11 @@ texts:
 - **develop**: 開発統合ブランチ  
 - **feature/***: 機能開発ブランチ
 
+### 🤖 CodeRabbit必須レビューワークフロー
+- **自動AI分析**: 全PRでコード品質・TDD・DDD準拠をチェック
+- **日本語対応**: プロジェクト特化の日本語コメント
+- **必須承認**: CodeRabbitの承認なしでは本番マージ不可
+
 ### 開発フロー
 1. このリポジトリをフォーク
 2. `develop`ブランチから機能ブランチを作成
@@ -426,6 +439,7 @@ texts:
 - 必ずテストを先に書いてください (TDD)
 - 全テストが通ることを確認してからコミット
 - lintエラーを解消してからコミット (`npm run lint`)
+- **CodeRabbitレビュー必須**: PRは必ずCodeRabbitの承認を得てからマージ
 - [CLAUDE.md](CLAUDE.md) の開発ガイドラインに従ってください
 - [BRANCHING_STRATEGY.md](BRANCHING_STRATEGY.md) のブランチ運用ルールを遵守してください
 

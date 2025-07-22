@@ -1,18 +1,27 @@
 import { GameLogicDDD } from './game/GameLogicDDD';
 import { TextLog } from './game/TextLog';
+import { SaveDataListService } from './application/services/SaveDataListService';
+import { SaveDataListView } from './ui/SaveDataListView';
+import { DexieGameProgressRepository } from './infrastructure/repositories/DexieGameProgressRepository';
 
 export class NovelGameApp {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private currentOptions: string[] = [];
-  private gameState: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' =
+  private gameState: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' | 'load_list' =
     'menu';
   private gameLogic: GameLogicDDD;
   private textLog: TextLog;
+  private saveDataListService: SaveDataListService;
+  private saveDataListView: SaveDataListView | null = null;
 
   constructor() {
     this.gameLogic = new GameLogicDDD();
     this.textLog = new TextLog();
+    
+    // SaveDataListService を初期化
+    const gameProgressRepository = new DexieGameProgressRepository();
+    this.saveDataListService = new SaveDataListService(gameProgressRepository);
 
     this.canvas = document.querySelector<HTMLCanvasElement>('#gameCanvas')!;
     if (!this.canvas) {
@@ -47,16 +56,7 @@ export class NovelGameApp {
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
 
     document.addEventListener('keydown', async (e) => {
-      if (e.key === 'Escape') {
-        if (this.gameState !== 'menu') {
-          this.showMainMenu();
-        }
-      } else if (this.gameState === 'menu' && /^[1-5]$/.test(e.key)) {
-        const index = parseInt(e.key) - 1;
-        if (index >= 0 && index < this.currentOptions.length) {
-          await this.selectMenuOption(this.currentOptions[index]);
-        }
-      }
+      await this.handleKeyDown(e);
     });
   }
 
@@ -96,16 +96,7 @@ export class NovelGameApp {
           }
           break;
         case 'load':
-          // 最新のゲーム状態を読み込み
-          await this.gameLogic.loadGameState();
-          this.gameState = 'game';
-          if (this.gameLogic.currentRoute === '') {
-            this.showMessage('セーブデータがありません');
-          } else {
-            this.showMessage(
-              `ロード完了！ルート: ${this.gameLogic.currentRoute}, シーン: ${this.gameLogic.currentScene}`
-            );
-          }
+          await this.showSaveDataList();
           break;
         case 'gallery':
           this.showGallery();
@@ -196,8 +187,80 @@ export class NovelGameApp {
   }
 
   public setGameState(
-    state: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame'
+    state: 'menu' | 'game' | 'gallery' | 'credits' | 'minigame' | 'load_list'
   ): void {
     this.gameState = state;
+  }
+
+  // Issue #6実装: セーブデータ一覧表示
+  private async showSaveDataList(): Promise<void> {
+    try {
+      this.gameState = 'load_list';
+      
+      // SaveDataListViewを初期化
+      this.saveDataListView = new SaveDataListView(
+        this.saveDataListService,
+        (id: string) => this.onSaveDataSelected(id),
+        () => this.onSaveDataSelectionCancelled()
+      );
+      
+      const result = await this.saveDataListView.show();
+      if (result.success) {
+        this.clearCanvas();
+        this.ctx.font = '24px Arial';
+        this.ctx.fillText('セーブデータ一覧', 300, 150);
+        this.ctx.font = '16px Arial';
+        this.ctx.fillText(result.message || '', 300, 200);
+        this.ctx.fillText('Escキーでメニューに戻る', 300, 500);
+      } else {
+        this.showMessage(result.message || 'セーブデータの読み込みに失敗しました');
+      }
+    } catch (error) {
+      this.showMessage('セーブデータの読み込みに失敗しました');
+    }
+  }
+
+  // セーブデータ選択時の処理
+  private async onSaveDataSelected(id: string): Promise<void> {
+    await this.loadSelectedSaveData(id);
+  }
+
+  // セーブデータ選択キャンセル時の処理
+  private onSaveDataSelectionCancelled(): void {
+    this.showMainMenu();
+  }
+
+  // 選択されたセーブデータをロード
+  private async loadSelectedSaveData(id: string): Promise<void> {
+    try {
+      const result = await this.saveDataListService.loadSaveDataById(id);
+      if (result.success && result.gameProgress) {
+        // ゲーム状態を更新
+        this.gameState = 'game';
+        this.showMessage(
+          `ロード完了！ルート: ${result.gameProgress.getCurrentRoute().getValue()}, シーン: ${result.gameProgress.getCurrentScene().getValue()}`
+        );
+      } else {
+        this.showMessage(result.message || 'セーブデータのロードに失敗しました');
+      }
+    } catch (error) {
+      this.showMessage('セーブデータのロードに失敗しました');
+    }
+  }
+
+  // キーボードイベント処理
+  public async handleKeyDown(e: KeyboardEvent): Promise<void> {
+    if (e.key === 'Escape') {
+      if (this.gameState === 'load_list') {
+        this.showMainMenu();
+      } else if (this.gameState !== 'menu') {
+        this.showMainMenu();
+      }
+    } else if (this.gameState === 'menu' && /^[1-5]$/.test(e.key)) {
+      const index = parseInt(e.key) - 1;
+      if (index >= 0 && index < this.currentOptions.length) {
+        await this.selectMenuOption(this.currentOptions[index]);
+      }
+    }
   }
 }
