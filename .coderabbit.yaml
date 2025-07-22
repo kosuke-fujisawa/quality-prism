@@ -1,0 +1,103 @@
+# CodeRabbit configuration file
+# For comprehensive language support and enhanced reviews
+
+language: ja  # 日本語でのコメント対応
+
+# Reviews configuration
+reviews:
+  # Request changes workflow if critical issues found
+  request_changes_workflow: false
+  
+  # High-level summary on by default
+  high_level_summary: true
+  
+  # Poem style summary (can be fun for team morale)
+  poem: true
+  
+  # Review all files in the repository
+  review_profile: chill
+  
+  # Enable auto reviews for opened PRs
+  auto_review:
+    enabled: true
+    
+    # Draft PRs won't be auto-reviewed
+    drafts: false
+
+# Language and framework-specific settings
+knowledge_base:
+  - TypeScript
+  - Node.js
+  - Vite
+  - Vitest
+  - Playwright
+  - DDD (Domain-Driven Design)
+  - TDD (Test-Driven Development)
+
+# Pathways to focus on
+path_filters:
+  # Include all TypeScript files
+  - "**/*.ts"
+  - "**/*.tsx"
+  - "**/*.js"
+  - "**/*.jsx"
+  
+  # Include config files
+  - "**/*.json"
+  - "**/*.yaml"
+  - "**/*.yml"
+  - "**/*.md"
+  
+  # Exclude generated files and dependencies
+  - "!node_modules/**"
+  - "!dist/**"
+  - "!build/**"
+  - "!coverage/**"
+  - "!test-results/**"
+  - "!playwright-report/**"
+
+# Custom instructions for this project
+instructions: |
+  このプロジェクトは『品質のプリズム』というノベルゲームのWebアプリケーションです。
+  
+  重要な開発方針:
+  - TDD (Test-Driven Development) を厳密に実践
+  - DDD (Domain-Driven Design) アーキテクチャを採用
+  - TypeScript型安全性を最大限活用
+  - 328テスト100%成功を維持
+  
+  レビューで特に注目してほしい点:
+  1. テストファーストの原則が守られているか
+  2. ドメインロジックが適切な層に配置されているか
+  3. エッジケース・境界値テストが含まれているか
+  4. TypeScript型定義が適切か
+  5. DDDレイヤー間の依存関係が正しいか
+  
+  アーキテクチャ構造:
+  - src/domain/ : エンティティ、値オブジェクト、リポジトリインターフェース
+  - src/application/ : アプリケーションサービス、ユースケース
+  - src/infrastructure/ : リポジトリ実装、データアクセス
+  
+  コードスタイル:
+  - ESLint + Prettier 準拠
+  - 関数型プログラミングスタイルを推奨
+  - 不変性を重視
+
+# Custom rules for code review
+checks:
+  - name: "test_first_rule"
+    description: "新機能追加時は必ずテストを先に書いているかチェック"
+    pattern: "*.test.ts"
+    
+  - name: "ddd_layer_separation"
+    description: "DDDレイヤーの適切な分離がされているかチェック"
+    
+  - name: "typescript_strict"
+    description: "TypeScript strict モードの遵守チェック"
+    
+  - name: "edge_case_coverage"
+    description: "エッジケース・境界値テストの網羅性チェック"
+
+# Chat configuration
+chat:
+  auto_reply: false
