@@ -1,5 +1,8 @@
 /**
  * 画像の読み込みとキャッシュ管理を行うクラス
+ * 
+ * @note 大量の画像をキャッシュする場合、メモリ使用量が問題になる可能性があります。
+ *       将来的にLRUキャッシュやキャッシュサイズの上限設定を検討してください。
  */
 export class ImageLoader {
   private imageCache: Map<string, HTMLImageElement> = new Map();
@@ -36,6 +39,7 @@ export class ImageLoader {
    * 複数の画像を並行して読み込む
    * @param imagePaths 画像ファイルのパスの配列
    * @returns 読み込まれた画像要素の配列
+   * @throws 1つでも画像の読み込みに失敗した場合、Promise全体がrejectされます
    */
   async preloadImages(imagePaths: string[]): Promise<HTMLImageElement[]> {
     const loadPromises = imagePaths.map(path => this.loadImage(path));

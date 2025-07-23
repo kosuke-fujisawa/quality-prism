@@ -398,6 +398,7 @@ export class NovelGameApp {
 
   /**
    * 画像を指定した位置とサイズで描画する（汎用メソッド）
+   * TODO: 将来的にキャラクター画像やシーン背景の描画に使用予定
    * @param imagePath 画像ファイルのパス
    * @param x X座標
    * @param y Y座標
