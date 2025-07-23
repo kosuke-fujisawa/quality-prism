@@ -1,6 +1,6 @@
 # 品質のプリズム (Quality Prism)
 
-[![Tests](https://img.shields.io/badge/tests-445%20total%20|%20445%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
+[![Tests](https://img.shields.io/badge/tests-458%20total%20|%20458%20passing-brightgreen)](https://github.com/kosuke-fujisawa/quality-prism)
 [![CodeRabbit](https://img.shields.io/badge/CodeRabbit-AI%20Code%20Review-blue)](https://coderabbit.ai)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
 [![TDD](https://img.shields.io/badge/development-TDD-orange)](CLAUDE.md)
@@ -17,7 +17,8 @@
 - 💾 **永続化**: IndexedDBによるセーブデータ管理
 - 📝 **YAML駆動**: シナリオファイルによる柔軟なコンテンツ管理
 - 🔀 **マルチルート**: 選択肢に基づく分岐ストーリー
-- 🧪 **高品質**: 445テスト・100%成功率
+- 🧪 **高品質**: 458テスト・100%成功率
+- 🖼️ **リッチUI**: 美しい背景画像・ロゴ画像によるタイトル画面
 - 🤖 **CodeRabbit**: AI駆動コードレビュー自動化
 - 📊 **ロギング**: エンタープライズレベルの監視・デバッグ機能
 
@@ -42,7 +43,7 @@ npm install
 npm run dev
 ```
 
-ブラウザで http://localhost:3000 にアクセスしてゲームを開始できます。
+ブラウザで http://localhost:5173 にアクセスしてゲームを開始できます。
 
 ## 🎮 操作方法
 
@@ -73,6 +74,9 @@ npm run dev
 ### データ管理
 - **Dexie**: IndexedDB wrapper (セーブデータ・設定)
 - **js-yaml**: YAMLファイル読み込み
+
+### UI・グラフィックス
+- **SVG**: スケーラブルベクターグラフィックス (背景・ロゴ画像)
 
 ### 開発・テスト
 - **Vitest**: 高速テストフレームワーク
@@ -189,21 +193,24 @@ npm audit --audit-level high
 このプロジェクトは **TDD (Test-Driven Development)** で開発されています。
 
 ### テスト統計
-- **総テスト数**: 445
-- **成功率**: 100% (445/445)
-- **単体テスト**: 431テスト (33ファイル) - **全テスト成功** 
+- **総テスト数**: 458
+- **成功率**: 100% (458/458)
+- **単体テスト**: 444テスト (34ファイル) - **全テスト成功** 
 - **E2Eテスト**: 14テスト (2ファイル)
 - **カバレッジ**: 全主要コンポーネント + DDDレイヤー完全網羅
 
 ### テストスイート
 
 #### 既存アーキテクチャ (66 tests)
-- `NovelGameApp.test.ts` (11 tests): UI・イベント処理
+- `NovelGameApp.test.ts` (17 tests): UI・イベント処理・画像表示機能
 - `ChoiceSystem.test.ts` (16 tests): 選択肢・ルート分岐
 - `ScenarioLoader.test.ts` (8 tests): YAMLファイル読み込み
 - `GameLogic.test.ts` (10 tests): ゲーム状態管理
 - `TextLog.test.ts` (13 tests): テキストログ
 - `SaveData.test.ts` (8 tests): データ永続化
+
+#### ユーティリティ層 (8 tests)
+- `ImageLoader.test.ts` (8 tests): 画像読み込み・キャッシュ・エラーハンドリング
 
 #### DDDアーキテクチャ - ドメイン層 (150 tests)
 - `GameProgress.test.ts` (7 tests): ゲーム進行エンティティ
@@ -295,12 +302,17 @@ quality-prism/
 │   │       └── SaveDataDB.ts    # Dexieデータベース
 │   ├── storage/                 # 従来のストレージ
 │   │   └── SaveData.ts          # セーブデータ管理
+│   ├── utils/                   # ユーティリティ層
+│   │   └── ImageLoader.ts       # 画像読み込み・キャッシュ管理
 │   └── test/                    # テスト共通ユーティリティ
 │       └── utils/
 │           └── testHelpers.ts   # テストヘルパー・モック・定数
 ├── tests/                       # E2Eテストディレクトリ
 │   └── e2e/                     # E2Eテストファイル
 ├── public/
+│   ├── images/                  # ゲーム用画像リソース
+│   │   ├── title_background.svg # タイトル画面背景画像
+│   │   └── logo.svg             # ロゴ画像
 │   └── scenarios/               # YAMLシナリオファイル
 │       ├── opening.yaml         # オープニング
 │       └── route1_1.yaml        # ルート1 シーン1
@@ -393,13 +405,14 @@ texts:
 - [x] YAMLシナリオローダー
 - [x] セーブデータシステム
 - [x] **DDDアーキテクチャ実装**
-- [x] **包括的テストスイート (445 tests)**
+- [x] **包括的テストスイート (458 tests)**
 - [x] **CodeRabbit AI レビュー**: 必須レビューワークフロー
 - [x] **Issue #6解決**: ロードボタンからセーブデータ一覧表示機能
 - [x] **TDD準拠開発プロセス**
 - [x] **エッジケース・エラーハンドリング**
 - [x] **データ永続化・復元システム**
 - [x] **E2Eテストフレームワーク（Playwright）**
+- [x] **Issue #8実装**: タイトル画面画像表示機能・ImageLoaderクラス
 
 ### 今後の予定 🚀
 - [ ] テキスト送りシステム (クリック/ENTERキー)
