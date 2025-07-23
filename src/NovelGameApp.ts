@@ -3,6 +3,7 @@ import { TextLog } from './game/TextLog';
 import { SaveDataListService } from './application/services/SaveDataListService';
 import { SaveDataListView } from './ui/SaveDataListView';
 import { DexieGameProgressRepository } from './infrastructure/repositories/DexieGameProgressRepository';
+import { ImageLoader } from './utils/ImageLoader';
 
 export class NovelGameApp {
   private canvas: HTMLCanvasElement;
@@ -14,10 +15,12 @@ export class NovelGameApp {
   private textLog: TextLog;
   private saveDataListService: SaveDataListService;
   private saveDataListView: SaveDataListView | null = null;
+  private imageLoader: ImageLoader;
 
   constructor() {
     this.gameLogic = new GameLogicDDD();
     this.textLog = new TextLog();
+    this.imageLoader = new ImageLoader();
     
     // SaveDataListService を初期化
     const gameProgressRepository = new DexieGameProgressRepository();
@@ -38,10 +41,42 @@ export class NovelGameApp {
     try {
       await this.gameLogic.loadGameState();
       await this.textLog.loadLogs();
+      await this.preloadImages();
       this.showMainMenu();
     } catch (error) {
       console.error('Failed to initialize game logic:', error);
       this.showMainMenu(); // フォールバック
+    }
+  }
+
+  private async preloadImages(): Promise<void> {
+    const imagePaths = [
+      '/images/title_background.svg',
+      '/images/logo.svg',
+    ];
+
+    const loadResults = await Promise.allSettled(
+      imagePaths.map(async (path) => {
+        try {
+          await this.imageLoader.loadImage(path);
+          return { path, success: true };
+        } catch (error) {
+          console.warn(`Failed to load image: ${path}`, error);
+          return { path, success: false, error };
+        }
+      })
+    );
+
+    // ロード結果をログ出力
+    const successCount = loadResults.filter(
+      result => result.status === 'fulfilled' && result.value.success
+    ).length;
+    
+    console.log(`Image preload completed: ${successCount}/${imagePaths.length} images loaded successfully`);
+    
+    // すべての画像の読み込みが失敗した場合のみ警告
+    if (successCount === 0) {
+      console.warn('No images could be loaded. The application will continue with text-only display.');
     }
   }
 
@@ -65,11 +100,12 @@ export class NovelGameApp {
     const y = e.clientY - rect.top;
 
     if (this.gameState === 'menu' && this.currentOptions.length > 0) {
-      // テキストのベースライン基準で描画されているため、クリック範囲を調整
-      // 各メニュー項目のY座標: 250, 300, 350, 400, 450
-      // クリック可能範囲: 各項目の上下25pxずつ（テキスト高さを考慮）
+      // レスポンシブなクリック位置計算（showMainMenuと同じロジック）
+      const startY = Math.max(300, this.canvas.height * 0.45);
+      const itemSpacing = Math.min(50, this.canvas.height * 0.08);
+      
       for (let i = 0; i < this.currentOptions.length; i++) {
-        const itemY = 250 + i * 50;
+        const itemY = startY + i * itemSpacing;
         const itemTop = itemY - 25; // テキストより上25px
         const itemBottom = itemY + 25; // テキストより下25px
 
@@ -120,15 +156,31 @@ export class NovelGameApp {
     this.gameState = 'menu';
     this.clearCanvas();
 
-    this.ctx.font = '36px Arial';
-    this.ctx.fillText('品質のプリズム', 250, 150);
+    // 背景画像を描画
+    this.drawBackgroundImage('/images/title_background.svg');
+
+    // ロゴ画像を描画
+    this.drawLogoImage('/images/logo.svg');
+
+    // ロゴ画像がない場合はテキストでタイトルを表示
+    if (!this.imageLoader.isImageCached('/images/logo.svg')) {
+      this.ctx.font = '36px Arial';
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.fillText('品質のプリズム', 250, 150);
+    }
 
     this.ctx.font = '24px Arial';
+    this.ctx.fillStyle = '#ffffff';
     this.currentOptions = ['start', 'load', 'gallery', 'mini game', 'credit'];
 
     this.currentOptions.forEach((option, index) => {
-      const y = 250 + index * 50;
-      this.ctx.fillText(`${index + 1}. ${option.toUpperCase()}`, 300, y);
+      // レスポンシブな位置計算
+      const startY = Math.max(300, this.canvas.height * 0.45); // Canvas高さの45%以降から開始
+      const itemSpacing = Math.min(50, this.canvas.height * 0.08); // 項目間隔をCanvasサイズに応じて調整
+      const y = startY + index * itemSpacing;
+      const x = this.canvas.width * 0.375; // Canvas幅の37.5%の位置（中央より少し左）
+      
+      this.ctx.fillText(`${index + 1}. ${option.toUpperCase()}`, x, y);
     });
 
     this.ctx.font = '16px Arial';
@@ -261,6 +313,109 @@ export class NovelGameApp {
       if (index >= 0 && index < this.currentOptions.length) {
         await this.selectMenuOption(this.currentOptions[index]);
       }
+    }
+  }
+
+  // 画像表示機能
+
+  /**
+   * 背景画像をロードする
+   * @param imagePath 画像ファイルのパス
+   */
+  private async loadBackgroundImage(imagePath: string): Promise<void> {
+    try {
+      await this.imageLoader.loadImage(imagePath);
+    } catch (error) {
+      console.warn(`Failed to load background image: ${imagePath}`, error);
+    }
+  }
+
+  /**
+   * 背景画像をCanvasに描画する（アスペクト比を維持）
+   * @param imagePath 画像ファイルのパス
+   */
+  private drawBackgroundImage(imagePath: string): void {
+    const image = this.imageLoader.getLoadedImage(imagePath);
+    if (image) {
+      const canvasAspect = this.canvas.width / this.canvas.height;
+      const imageAspect = image.width / image.height;
+
+      let drawWidth, drawHeight, drawX, drawY;
+
+      if (imageAspect > canvasAspect) {
+        // 画像の方が横に長い場合：高さを基準にスケール
+        drawHeight = this.canvas.height;
+        drawWidth = drawHeight * imageAspect;
+        drawX = (this.canvas.width - drawWidth) / 2;
+        drawY = 0;
+      } else {
+        // 画像の方が縦に長い場合：幅を基準にスケール
+        drawWidth = this.canvas.width;
+        drawHeight = drawWidth / imageAspect;
+        drawX = 0;
+        drawY = (this.canvas.height - drawHeight) / 2;
+      }
+
+      this.ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
+  }
+
+  /**
+   * ロゴ画像をCanvasに描画する（レスポンシブ対応）
+   * @param imagePath 画像ファイルのパス
+   */
+  private drawLogoImage(imagePath: string): void {
+    const image = this.imageLoader.getLoadedImage(imagePath);
+    if (image) {
+      // Canvasサイズに応じてロゴサイズを調整
+      const maxLogoWidth = this.canvas.width * 0.6; // Canvas幅の60%以下
+      const maxLogoHeight = this.canvas.height * 0.25; // Canvas高さの25%以下
+      
+      const imageAspect = image.width / image.height;
+      let logoWidth, logoHeight;
+      
+      // アスペクト比を維持しながらサイズを決定
+      if (image.width > maxLogoWidth || image.height > maxLogoHeight) {
+        if (maxLogoWidth / imageAspect <= maxLogoHeight) {
+          logoWidth = maxLogoWidth;
+          logoHeight = maxLogoWidth / imageAspect;
+        } else {
+          logoHeight = maxLogoHeight;
+          logoWidth = maxLogoHeight * imageAspect;
+        }
+      } else {
+        logoWidth = image.width;
+        logoHeight = image.height;
+      }
+      
+      // 中央上部に配置
+      const x = (this.canvas.width - logoWidth) / 2;
+      const y = Math.max(20, this.canvas.height * 0.08); // 上から8%の位置、最小20px
+
+      this.ctx.drawImage(image, x, y, logoWidth, logoHeight);
+    }
+  }
+
+  /**
+   * 画像を指定した位置とサイズで描画する（汎用メソッド）
+   * @param imagePath 画像ファイルのパス
+   * @param x X座標
+   * @param y Y座標
+   * @param width 幅
+   * @param height 高さ
+   */
+  private drawImage(
+    imagePath: string,
+    x: number,
+    y: number,
+    width?: number,
+    height?: number
+  ): void {
+    const image = this.imageLoader.getLoadedImage(imagePath);
+    if (image) {
+      const drawWidth = width || image.width;
+      const drawHeight = height || image.height;
+      this.ctx.drawImage(image, x, y, drawWidth, drawHeight);
     }
   }
 }
