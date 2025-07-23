@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NovelGameApp } from './NovelGameApp';
+import { ImageLoader } from './utils/ImageLoader';
 
 // DOM環境のモック
 Object.defineProperty(window, 'HTMLCanvasElement', {
@@ -13,6 +14,7 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
         fillText: vi.fn(),
         fillRect: vi.fn(),
         measureText: vi.fn(() => ({ width: 100 })),
+        drawImage: vi.fn(),
       };
     }
     addEventListener = vi.fn();
@@ -191,6 +193,100 @@ describe('NovelGameApp', () => {
       expect(() => {
         (app as any).selectMenuOption('invalid');
       }).not.toThrow();
+    });
+  });
+
+  describe('画像表示機能', () => {
+    let mockImageLoader: any;
+
+    beforeEach(() => {
+      // ImageLoaderのモック作成
+      mockImageLoader = {
+        loadImage: vi.fn(),
+        preloadImages: vi.fn(),
+        getLoadedImage: vi.fn(),
+        clearCache: vi.fn(),
+        isImageCached: vi.fn(),
+      };
+
+      app = new NovelGameApp();
+      (app as any).imageLoader = mockImageLoader;
+    });
+
+    it('背景画像をロードできる', async () => {
+      const mockImage = new Image();
+      mockImageLoader.loadImage.mockResolvedValue(mockImage);
+
+      await (app as any).loadBackgroundImage('/images/title_bg.jpg');
+
+      expect(mockImageLoader.loadImage).toHaveBeenCalledWith('/images/title_bg.jpg');
+    });
+
+    it('背景画像をCanvasに描画できる', async () => {
+      const mockImage = {
+        width: 800,
+        height: 600,
+      } as HTMLImageElement;
+      
+      mockImageLoader.getLoadedImage.mockReturnValue(mockImage);
+      const drawImageSpy = vi.spyOn((app as any).ctx, 'drawImage');
+
+      (app as any).drawBackgroundImage('/images/title_bg.jpg');
+
+      expect(mockImageLoader.getLoadedImage).toHaveBeenCalledWith('/images/title_bg.jpg');
+      expect(drawImageSpy).toHaveBeenCalledWith(mockImage, 0, 0, 800, 600);
+    });
+
+    it('画像が見つからない場合はエラーハンドリングされる', async () => {
+      mockImageLoader.loadImage.mockRejectedValue(new Error('Image not found'));
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await (app as any).loadBackgroundImage('/images/nonexistent.jpg');
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to load background image: /images/nonexistent.jpg',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('ロゴ画像を正しい位置に描画できる', () => {
+      const mockImage = {
+        width: 400,
+        height: 200,
+      } as HTMLImageElement;
+      
+      mockImageLoader.getLoadedImage.mockReturnValue(mockImage);
+      const drawImageSpy = vi.spyOn((app as any).ctx, 'drawImage');
+
+      (app as any).drawLogoImage('/images/logo.svg');
+
+      // レスポンシブ対応の計算結果
+      // maxLogoWidth = 800 * 0.6 = 480
+      // maxLogoHeight = 600 * 0.25 = 150
+      // imageAspect = 400 / 200 = 2
+      // 400 > 480 は false, 200 > 150 は true なので maxLogoHeight基準
+      // logoHeight = 150, logoWidth = 150 * 2 = 300
+      // x = (800 - 300) / 2 = 250
+      // y = Math.max(20, 600 * 0.08) = Math.max(20, 48) = 48
+
+      expect(drawImageSpy).toHaveBeenCalledWith(
+        mockImage,
+        250, // (800 - 300) / 2
+        48,  // Math.max(20, 600 * 0.08)
+        300, // レスポンシブ調整後の幅
+        150  // レスポンシブ調整後の高さ
+      );
+    });
+
+    it('キャッシュされていない画像の描画時は何もしない', () => {
+      mockImageLoader.getLoadedImage.mockReturnValue(null);
+      const drawImageSpy = vi.spyOn((app as any).ctx, 'drawImage');
+
+      (app as any).drawBackgroundImage('/images/not_cached.jpg');
+
+      expect(drawImageSpy).not.toHaveBeenCalled();
     });
   });
 });

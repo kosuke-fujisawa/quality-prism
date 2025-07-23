@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
+  <defs>
+    <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="black" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+  
+  <!-- 装飾的な枠 -->
+  <rect x="10" y="10" width="380" height="180" fill="none" stroke="white" stroke-width="3" rx="15"/>
+  
+  <!-- ロゴテキスト -->
+  <text x="200" y="100" 
+        text-anchor="middle" 
+        dominant-baseline="middle" 
+        font-family="Arial, sans-serif" 
+        font-size="48" 
+        font-weight="bold" 
+        fill="white" 
+        filter="url(#drop-shadow)">
+    品質のプリズム
+  </text>
+  
+  <!-- 装飾的な要素 -->
+  <g opacity="0.7" fill="white">
+    <polygon points="30,50 45,30 60,50" />
+    <polygon points="340,150 355,130 370,150" />
+    <circle cx="50" cy="150" r="8"/>
+    <circle cx="350" cy="50" r="8"/>
+  </g>
+</svg>
