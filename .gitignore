@@ -17,8 +17,19 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Test and report output
+playwright-report/
+test-results/
+coverage/
